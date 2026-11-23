@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" viewBox="0 0 720 360" width="720" height="360">
+  <rect width="720" height="360" fill="#fff"/>
+  <text x="20" y="30" font-weight="700">Fast-Forward-Merge</text>
+  <text x="20" y="50" font-size="12" fill="#555">main hat sich seit dem Abzweigen nicht verändert → main wird einfach nach vorne geschoben</text>
+  <line x1="80" y1="110" x2="440" y2="110" stroke="#555" stroke-width="2"/>
+  <circle cx="80" cy="110" r="14" fill="#fff4ef" stroke="#333"/><text x="80" y="115" text-anchor="middle" font-size="12" font-weight="600">C1</text> <circle cx="170" cy="110" r="14" fill="#fff4ef" stroke="#333"/><text x="170" y="115" text-anchor="middle" font-size="12" font-weight="600">C2</text> <circle cx="260" cy="110" r="14" fill="#ede9fe" stroke="#333"/><text x="260" y="115" text-anchor="middle" font-size="12" font-weight="600">C3</text> <circle cx="350" cy="110" r="14" fill="#ede9fe" stroke="#333"/><text x="350" y="115" text-anchor="middle" font-size="12" font-weight="600">C4</text>
+  <rect x="136" y="132" width="68" height="24" rx="12" fill="none" stroke="#f1502f" stroke-dasharray="4 3"/><text x="170" y="148" text-anchor="middle" fill="#f1502f" font-size="12">main vorher</text>
+  <rect x="316" y="67" width="68" height="24" rx="12" fill="#f1502f"/><text x="350" y="84" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">main</text> <rect x="316" y="132" width="68" height="24" rx="12" fill="#7c3aed"/><text x="350" y="148" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">feature</text>
+  
+  <text x="480" y="114" font-size="12" fill="#555">kein neuer Commit,</text>
+  <text x="480" y="130" font-size="12" fill="#555">Historie bleibt linear</text>
+  <line x1="20" y1="180" x2="700" y2="180" stroke="#ddd"/>
+  <text x="20" y="210" font-weight="700">Three-Way-Merge</text>
+  <text x="20" y="230" font-size="12" fill="#555">beide Branches haben neue Commits → Git erzeugt einen Merge-Commit mit zwei Vorgängern</text>
+  <line x1="80" y1="280" x2="440" y2="280" stroke="#555" stroke-width="2"/> <line x1="170" y1="280" x2="260" y2="330" stroke="#555" stroke-width="2"/> <line x1="260" y1="330" x2="350" y2="330" stroke="#555" stroke-width="2"/> <line x1="350" y1="330" x2="440" y2="280" stroke="#555" stroke-width="2"/>
+  <circle cx="80" cy="280" r="14" fill="#fff4ef" stroke="#333"/><text x="80" y="285" text-anchor="middle" font-size="12" font-weight="600">C1</text> <circle cx="170" cy="280" r="14" fill="#fff4ef" stroke="#333"/><text x="170" y="285" text-anchor="middle" font-size="12" font-weight="600">C2</text> <circle cx="300" cy="280" r="14" fill="#fff4ef" stroke="#333"/><text x="300" y="285" text-anchor="middle" font-size="12" font-weight="600">C5</text> <circle cx="260" cy="330" r="14" fill="#ede9fe" stroke="#333"/><text x="260" y="335" text-anchor="middle" font-size="12" font-weight="600">C3</text> <circle cx="350" cy="330" r="14" fill="#ede9fe" stroke="#333"/><text x="350" y="335" text-anchor="middle" font-size="12" font-weight="600">C4</text> <circle cx="440" cy="280" r="14" fill="#fde68a" stroke="#333"/><text x="440" y="285" text-anchor="middle" font-size="12" font-weight="600">M</text>
+  <rect x="406" y="239" width="68" height="24" rx="12" fill="#f1502f"/><text x="440" y="256" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">main</text> <rect x="386" y="317" width="68" height="24" rx="12" fill="#7c3aed"/><text x="420" y="334" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">feature</text>
+  <text x="480" y="276" font-size="12" fill="#555">M = Merge-Commit,</text>
+  <text x="480" y="292" font-size="12" fill="#555">Vorgänger: C5 und C4</text>
+</svg>

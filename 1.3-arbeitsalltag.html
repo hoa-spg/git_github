@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.3 &ndash; Der Arbeitsalltag mit Git | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 1.3 &mdash; Teil 1: Git-Grundlagen &amp; Werkzeuge</p>
+      <h1>Der Arbeitsalltag mit Git</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-git">Arbeitsablauf</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Grundlagen</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Die Zustände einer Datei (untracked, unverändert, geändert, vorgemerkt) erkennen</li>
+          <li>Änderungen mit <code>git diff</code> vor dem Commit überprüfen</li>
+          <li>Kleine, zusammenhängende Commits mit aussagekräftigen Messages erstellen</li>
+          <li>Die Historie mit <code>git log</code> und <code>git show</code> untersuchen</li>
+          <li>Mit einer <code>.gitignore</code>-Datei festlegen, was nicht ins Repository gehört</li>
+          <li>Änderungen auf der passenden Ebene rückgängig machen</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Der Kreislauf: ändern, prüfen, vormerken, committen</h2>
+        <p>Aus Sicht von Git befindet sich jede Datei in deinem Arbeitsverzeichnis in einem von vier Zuständen:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Zustand</th><th>Bedeutung</th><th>Anzeige in <code>git status</code></th><th>Weiter mit</th></tr></thead>
+            <tbody>
+              <tr><td><strong>untracked</strong></td><td>Neue Datei, Git verfolgt sie nicht</td><td>Untracked files</td><td><code>git add</code></td></tr>
+              <tr><td><strong>unverändert</strong></td><td>Wie im letzten Commit</td><td>(nicht angezeigt)</td><td>bearbeiten</td></tr>
+              <tr><td><strong>geändert</strong> (modified)</td><td>Bearbeitet, aber nicht vorgemerkt</td><td>Changes not staged for commit</td><td><code>git add</code></td></tr>
+              <tr><td><strong>vorgemerkt</strong> (staged)</td><td>Kommt in den nächsten Commit</td><td>Changes to be committed</td><td><code>git commit</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Nach dem Commit sind alle vorgemerkten Dateien wieder „unverändert“ &mdash; der Kreislauf beginnt von vorne. Ein typischer Ablauf:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git status                  # Wo stehe ich?
+git diff                    # Was genau habe ich geändert?
+git add index.html          # Änderung vormerken
+git status                  # Ist das Richtige vorgemerkt?
+git commit -m "Hobbys ergänzt"</code></pre>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Kurzform von git status</div>
+    <p><code>git status -s</code> zeigt eine Zeile pro Datei: <code>??</code> = untracked, <code> M</code> = geändert, <code>M </code> = vorgemerkt, <code>A </code> = neu vorgemerkt. Die linke Spalte ist die Staging Area, die rechte das Arbeitsverzeichnis.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>2 — Änderungen ansehen mit git diff</h2>
+        <p>Bevor du committest, solltest du wissen, was du committest. <code>git diff</code> zeigt die Unterschiede zeilenweise:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git diff
+# diff --git a/index.html b/index.html
+# --- a/index.html
+# +++ b/index.html
+# @@ -8,5 +8,6 @@
+#  &lt;body&gt;
+#    &lt;h1&gt;Max Muster&lt;/h1&gt;
+# -  &lt;p&gt;Schüler an der HTL.&lt;/p&gt;
+# +  &lt;p&gt;Schüler an der HTL, Klasse 3AHIF.&lt;/p&gt;
+# +  &lt;p&gt;Hobbys: Klettern, Gitarre&lt;/p&gt;
+#  &lt;/body&gt;</code></pre>
+</div>
+        <p>Zeilen mit <code>-</code> wurden entfernt, Zeilen mit <code>+</code> hinzugefügt, Zeilen ohne Zeichen dienen als Kontext. Eine geänderte Zeile erscheint als „alte Zeile entfernt, neue Zeile hinzugefügt“. <code>@@ -8,5 +8,6 @@</code> gibt an, wo der Ausschnitt in der alten und neuen Datei liegt.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>vergleicht</th></tr></thead>
+            <tbody>
+              <tr><td><code>git diff</code></td><td>Arbeitsverzeichnis mit Staging Area (= was noch nicht vorgemerkt ist)</td></tr>
+              <tr><td><code>git diff --staged</code></td><td>Staging Area mit letztem Commit (= was in den nächsten Commit kommt)</td></tr>
+              <tr><td><code>git diff a1f3c9e e93c0a2</code></td><td>zwei beliebige Commits</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>3 — Vormerken und committen</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td><code>git add datei.html</code></td><td>eine Datei vormerken</td></tr>
+              <tr><td><code>git add css/</code></td><td>alle Änderungen in einem Ordner vormerken</td></tr>
+              <tr><td><code>git add .</code></td><td>alle Änderungen im aktuellen Ordner und darunter vormerken (vorher <code>git status</code> lesen!)</td></tr>
+              <tr><td><code>git rm datei.html</code></td><td>Datei löschen und das Löschen vormerken</td></tr>
+              <tr><td><code>git mv alt.html neu.html</code></td><td>Datei umbenennen und vormerken</td></tr>
+              <tr><td><code>git commit -m "…"</code></td><td>Vorgemerktes als Commit speichern</td></tr>
+              <tr><td><code>git commit -am "…"</code></td><td>alle Änderungen an <strong>bereits verfolgten</strong> Dateien vormerken und committen (neue Dateien nicht!)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Was ist ein guter Commit?</h3>
+        <p>Ein Commit enthält <strong>eine logische Änderung</strong>: „Navigation ergänzt“, „Tippfehler im Impressum behoben“. Nicht: „Montag“ oder „alles von heute“. Kleine Commits lassen sich leichter verstehen, prüfen und bei Bedarf einzeln rückgängig machen.</p>
+        <div class="do-dont">
+          <div class="do-box">
+            <h4>Gute Commit-Messages</h4>
+            <ul>
+              <li>Kontaktformular ergänzt</li>
+              <li>Falsche Telefonnummer im Footer korrigiert</li>
+              <li>Bilder auf WebP umgestellt (Ladezeit halbiert)</li>
+              <li>Fix: Menü auf dem Handy überdeckte Inhalt</li>
+            </ul>
+          </div>
+          <div class="dont-box">
+            <h4>Schlechte Commit-Messages</h4>
+            <ul>
+              <li>update</li>
+              <li>asdf</li>
+              <li>Änderungen</li>
+              <li>jetzt gehts endlich!!!</li>
+            </ul>
+          </div>
+        </div>
+        <ul>
+          <li>Erste Zeile: kurze Zusammenfassung (bis ca. 50 Zeichen), ohne Punkt am Ende.</li>
+          <li>Bei Bedarf nach einer Leerzeile weitere Zeilen: <em>warum</em> wurde geändert? (Das „Was“ steht im Diff.)</li>
+          <li>Im Team eine Sprache festlegen &mdash; in internationalen Projekten Englisch im Imperativ: „Add contact form“.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>4 — Die Historie untersuchen</h2>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git log --oneline
+# 7a91d2e (HEAD -&gt; main, origin/main) Hobbys ergänzt
+# b203833 Steckbrief-Seite angelegt
+# f437d39 Initial commit</code></pre>
+</div>
+        <p>
+          Der neueste Commit steht oben. In Klammern zeigt Git Markierungen: <code>main</code> ist die Hauptlinie,
+          <code>origin/main</code> der zuletzt bekannte Stand am Server, und <strong>HEAD</strong> zeigt an, welcher
+          Commit gerade in deinem Arbeitsverzeichnis ausgecheckt ist &mdash; normalerweise der neueste
+          Commit von <code>main</code>. Dass <code>main</code> und <code>origin/main</code> hier auf demselben Commit stehen, heißt:
+          Alles ist gepusht.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>zeigt</th></tr></thead>
+            <tbody>
+              <tr><td><code>git log</code></td><td>ausführliche Liste mit vollem Hash, Autor, Datum, Message (beenden mit <kbd>q</kbd>)</td></tr>
+              <tr><td><code>git log --oneline -5</code></td><td>die letzten 5 Commits, je eine Zeile</td></tr>
+              <tr><td><code>git log -p index.html</code></td><td>alle Commits, die <code>index.html</code> geändert haben, samt Diff</td></tr>
+              <tr><td><code>git log --author="Max"</code></td><td>nur Commits eines Autors</td></tr>
+              <tr><td><code>git show 7a91d2e</code></td><td>einen einzelnen Commit mit seinem Diff</td></tr>
+              <tr><td><code>git blame index.html</code></td><td>für jede Zeile: in welchem Commit und von wem sie zuletzt geändert wurde</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Die Historie auf GitHub</div>
+    <p>Auf GitHub siehst du dieselbe Historie unter <strong>Commits</strong> (Uhrsymbol über der
+          Dateiliste). Ein Klick auf einen Commit zeigt seinen Diff &mdash; rot entfernte, grün hinzugefügte Zeilen.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>5 — .gitignore: was nicht ins Repository gehört</h2>
+        <p>Manche Dateien liegen im Projektordner, sollen aber nie committet werden:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Art</th><th>Beispiele</th><th>Warum nicht?</th></tr></thead>
+            <tbody>
+              <tr><td>Abhängigkeiten</td><td><code>node_modules/</code></td><td>riesig, mit <code>npm install</code> wiederherstellbar</td></tr>
+              <tr><td>Build-Ergebnisse</td><td><code>dist/</code>, <code>build/</code>, <code>target/</code>, <code>*.class</code></td><td>werden aus dem Quellcode erzeugt</td></tr>
+              <tr><td>Geheimnisse</td><td><code>.env</code>, Schlüsseldateien</td><td>Passwörter und API-Keys gehören nie in ein Repository</td></tr>
+              <tr><td>Editor-/IDE-Dateien</td><td><code>.idea/</code>, <code>.vscode/</code>, <code>*.iml</code></td><td>persönliche Einstellungen</td></tr>
+              <tr><td>Betriebssystem-Dateien</td><td><code>.DS_Store</code>, <code>Thumbs.db</code></td><td>automatisch angelegter Müll</td></tr>
+              <tr><td>Logs, temporäre Dateien</td><td><code>*.log</code>, <code>*.tmp</code></td><td>ändern sich ständig, ohne Wert</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Diese Muster schreibst du in eine Datei namens <code>.gitignore</code> im Hauptordner des Repositorys. Die Datei selbst wird committet, damit sie für das ganze Team gilt:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">.gitignore</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext"># Abhängigkeiten und Build
+node_modules/
+dist/
+
+# Geheimnisse
+.env
+.env.*
+!.env.example
+
+# Editor und Betriebssystem
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Muster</th><th>passt auf</th></tr></thead>
+            <tbody>
+              <tr><td><code>*.log</code></td><td>alle Dateien mit Endung .log, in jedem Ordner</td></tr>
+              <tr><td><code>dist/</code></td><td>Ordner <code>dist</code> mit gesamtem Inhalt</td></tr>
+              <tr><td><code>/todo.txt</code></td><td>nur <code>todo.txt</code> im Hauptordner (führender Schrägstrich)</td></tr>
+              <tr><td><code>!.env.example</code></td><td>Ausnahme: diese Datei doch verfolgen</td></tr>
+              <tr><td><code># …</code></td><td>Kommentar</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Vorlagen</div>
+    <p>Für fast jede Sprache gibt es fertige Vorlagen unter <strong>github.com/github/gitignore</strong>
+          (z.&nbsp;B. <code>Node.gitignore</code>, <code>Java.gitignore</code>). GitHub bietet sie auch beim Anlegen eines Repositorys an.
+          Projektgeneratoren wie Vite oder Angular CLI legen die passende <code>.gitignore</code> selbst an.</p>
+  </div>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">.gitignore wirkt nur auf noch nicht verfolgte Dateien</div>
+    <p>Wurde eine Datei bereits committet, ignoriert Git sie auch nach dem Eintrag in <code>.gitignore</code> nicht. Du musst sie zuerst aus dem Repository entfernen (die Datei auf der Festplatte bleibt erhalten):</p>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git rm --cached -r .idea
+git commit -m ".idea nicht mehr versionieren"</code></pre>
+</div>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>6 — Änderungen rückgängig machen</h2>
+        <p>Was du tun musst, hängt davon ab, <strong>wie weit</strong> die Änderung schon gekommen ist:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Situation</th><th>Befehl</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td>Datei geändert, nicht vorgemerkt &mdash; Änderung verwerfen</td><td><code>git restore index.html</code></td><td>Datei wieder wie im letzten Commit. <strong>Die Änderung ist weg!</strong></td></tr>
+              <tr><td>Versehentlich vorgemerkt</td><td><code>git restore --staged index.html</code></td><td>aus der Staging Area nehmen, Änderung bleibt in der Datei</td></tr>
+              <tr><td>Letzter Commit: Tippfehler in der Message oder Datei vergessen &mdash; <strong>noch nicht gepusht</strong></td><td><code>git add vergessen.css</code><br><code>git commit --amend -m "…"</code></td><td>ersetzt den letzten Commit durch einen korrigierten (neuer Hash)</td></tr>
+              <tr><td>Ein Commit war falsch &mdash; <strong>bereits gepusht</strong></td><td><code>git revert 7a91d2e</code></td><td>erzeugt einen <em>neuen</em> Commit, der die Änderungen von <code>7a91d2e</code> umkehrt; die Historie bleibt erhalten</td></tr>
+              <tr><td>Eine alte Version einer Datei zurückholen</td><td><code>git restore --source=b203833 index.html</code></td><td>Datei im Arbeitsverzeichnis auf den Stand dieses Commits setzen, danach normal committen</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-error">
+  <div class="callout-icon">&#10007;</div>
+  <div class="callout-body">
+    <div class="callout-title">Gepushte Commits nie umschreiben</div>
+    <code>--amend</code> (und andere Befehle, die Commits ersetzen) ändern die Hashes. Wurden die Commits schon
+          gepusht und haben andere sie geholt, passt ihre Historie nicht mehr zur Historie am Server. Für gepushte
+          Commits deshalb immer <code>git revert</code> verwenden.
+  </div>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">git reset --hard</div>
+    <p>Im Internet liest du oft <code>git reset --hard</code>. Der Befehl verwirft alle nicht committeten
+          Änderungen und kann Commits „verschwinden“ lassen. Verwende ihn erst, wenn du genau weißt,
+          was er tut.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 1.3</span>
+    <h3>Saubere Commits und eine .gitignore</h3>
+  </div>
+<ol>
+            <li>Lege im Repository <code>steckbrief</code> eine <code>.gitignore</code> an und committe sie allein:</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">steckbrief/.gitignore</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext">.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log</code></pre>
+</div>
+          <ol start="2">
+            <li>Lege <code>style.css</code> an und binde sie in <code>index.html</code> ein (<code>&lt;link rel="stylesheet" href="style.css"&gt;</code> im <code>&lt;head&gt;</code>). Committe <strong>beide</strong> Dateien gemeinsam &mdash; sie gehören zu einer logischen Änderung.</li>
+            <li>Ergänze in <code>index.html</code> einen Absatz mit deinen Hobbys. Prüfe vor dem Commit mit <code>git diff</code>, dann eigener Commit.</li>
+            <li>Pushe und kontrolliere die Historie lokal und auf GitHub:</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git add .gitignore
+git commit -m ".gitignore angelegt"
+git add style.css index.html
+git commit -m "Stylesheet eingebunden"
+git diff
+git commit -am "Hobbys ergänzt"
+git push
+git log --oneline</code></pre>
+</div>
+          <p><strong>Ergebnis:</strong> drei neue, klar beschriebene Commits auf GitHub.</p>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Neue Datei mit commit -am vergessen</div>
+  <p>Nach <code>git commit -am "Galerie ergänzt"</code> fehlt <code>galerie.html</code> im Commit &mdash; die Datei war neu (untracked).</p>
+          <p class="fehler-fix"><code>-a</code> erfasst nur bereits verfolgte Dateien. Neue Dateien immer mit <code>git add</code> vormerken und vor dem Commit <code>git status</code> lesen.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Passwort committet und „wieder gelöscht“</div>
+  <p>Die Datei <code>.env</code> mit einem API-Key wurde gepusht, im nächsten Commit gelöscht. Der Key ist trotzdem in der Historie und auf GitHub für jeden lesbar.</p>
+          <p class="fehler-fix">Geheimnisse sofort beim Anbieter ungültig machen und neu erzeugen. Vorbeugend <code>.env</code> von Anfang an in <code>.gitignore</code> eintragen.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Ein Riesen-Commit am Ende des Tages</div>
+  <p>Ein einziger Commit „Änderungen“ enthält Layout, Texte, einen Bugfix und eine halbfertige Funktion. Der Bugfix lässt sich nicht einzeln übernehmen oder rückgängig machen.</p>
+          <p class="fehler-fix">Nach jedem abgeschlossenen Arbeitsschritt committen; zusammengehörige Dateien gezielt mit <code>git add &lt;datei&gt;</code> vormerken.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Zustände beobachten</span>
+  </div>
+  <p>Lege in einem Übungsrepository eine neue Datei an, ändere eine bestehende und lösche eine dritte (mit <code>git rm</code>). Führe nach jedem Schritt <code>git status</code> und <code>git status -s</code> aus und notiere, in welchem Zustand jede Datei ist. Merke dann nur zwei der drei Änderungen vor und committe.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Commit-Messages verbessern</span>
+  </div>
+  <p>Schreibe für folgende Änderungen je eine gute Commit-Message: (a) Die Schriftgröße auf dem Handy war zu klein. (b) Die Seite „Über uns“ ist neu. (c) Ein Link im Footer zeigte auf eine nicht existierende Seite. (d) <code>node_modules</code> wurde versehentlich committet und wird entfernt.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Rückgängig machen üben</span>
+  </div>
+  <p>Spiele jede Zeile der Tabelle in Abschnitt 6 in deinem Übungsrepository durch. Kontrolliere jeweils mit <code>git status</code> und <code>git log --oneline</code>, was passiert ist. Bei welchen Befehlen ändert sich die Commit-Historie, bei welchen nicht?</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Detektivarbeit</span>
+  </div>
+  <p>Klone ein großes Open-Source-Repository (z.&nbsp;B. <code>https://github.com/expressjs/express</code>). Finde mit <code>git log</code> heraus: Wann war der erste Commit? Wer hat die meisten Commits (Tipp: <code>git shortlog -sn | head</code>)? Wer hat zuletzt die Datei <code>Readme.md</code> geändert?</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was zeigt <code>git diff --staged</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Alle Änderungen, die noch nicht vorgemerkt sind</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Die Änderungen, die in den nächsten Commit kommen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Die Unterschiede zwischen lokalem Repository und GitHub</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Alle Dateien, die in <code>.gitignore</code> stehen</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>--staged</code> vergleicht die Staging Area mit dem letzten Commit. Ohne Option zeigt <code>git diff</code> die noch nicht vorgemerkten Änderungen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Welche Dateien gehören typischerweise in die <code>.gitignore</code>?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>node_modules/</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>.env</code> mit Zugangsdaten</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-2"> <span><code>index.html</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>.DS_Store</code> und <code>Thumbs.db</code></span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Abhängigkeiten, Geheimnisse und automatisch erzeugte Systemdateien gehören nicht ins Repository. Quellcode wie <code>index.html</code> natürlich schon.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Ein bereits <strong>gepushter</strong> Commit hat einen Fehler eingebaut. Wie machst du ihn sicher rückgängig?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>git commit --amend</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>git restore index.html</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span><code>git revert &lt;hash&gt;</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Die Datei <code>.git</code> löschen und neu klonen</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>git revert</code> erzeugt einen neuen Commit, der die Änderung umkehrt, ohne die bestehende Historie zu verändern. <code>--amend</code> schreibt den letzten Commit um und ist nur für ungepushte Commits geeignet.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Du hast <code>config.json</code> committet und erst danach in <code>.gitignore</code> eingetragen. Was passiert?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Git löscht die Datei automatisch aus dem Repository.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Git verfolgt die Datei weiterhin, bis du sie mit <code>git rm --cached</code> entfernst.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Die Datei wird auf der Festplatte gelöscht.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Git meldet einen Fehler beim nächsten Commit.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>.gitignore</code> betrifft nur Dateien, die Git noch nicht verfolgt. Bereits verfolgte Dateien muss man mit <code>git rm --cached</code> aus dem Repository nehmen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> <code>git log --oneline</code> zeigt <code>7a91d2e (HEAD -&gt; main, origin/main) Hobbys ergänzt</code>. Was folgt daraus?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der Commit ist noch nicht gepusht.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Der lokale <code>main</code> und der zuletzt bekannte Stand am Server zeigen auf denselben Commit.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es gibt einen Merge-Konflikt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>HEAD ist der Name des Servers.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>origin/main</code> ist der zuletzt bekannte Stand von <code>main</code> am Server. Steht er beim selben Commit wie das lokale <code>main</code>, ist alles gepusht. HEAD markiert den ausgecheckten Commit.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="1.2-github-einrichten.html">&larr; Lektion 1.2: Git &amp; GitHub einrichten</a>
+      <span class="nav-center-info">Lektion 1.3</span>
+      <a class="nav-btn primary" href="1.4-vscode-intellij.html">Lektion 1.4: Git in VS Code und IntelliJ &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

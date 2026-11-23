@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.1 &ndash; Branches &amp; Merge | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 2.1 &mdash; Teil 2: Branches &amp; Zusammenarbeit</p>
+      <h1>Branches &amp; Merge</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-gh">Branches</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Grundlagen</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Erklären, wozu Branches dienen und was ein Branch technisch ist</li>
+          <li>Die Bedeutung von <strong>HEAD</strong> beschreiben</li>
+          <li>Branches anlegen, wechseln, auflisten und löschen</li>
+          <li>Unfertige Änderungen mit <code>git stash</code> beiseitelegen</li>
+          <li>Fast-Forward-Merge und Three-Way-Merge unterscheiden und durchführen</li>
+          <li>Branches pushen und Remote-Branches mit <code>fetch</code> und <code>pull</code> abgleichen</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Wozu Branches?</h2>
+        <p>
+          Bisher lagen alle Commits hintereinander auf <code>main</code>. Das wird schnell zum Problem: Du arbeitest
+          an einer neuen Galerie, die erst halb fertig ist &mdash; und plötzlich muss ein Tippfehler auf der
+          Startseite sofort korrigiert werden. Oder zwei Teammitglieder entwickeln gleichzeitig verschiedene
+          Funktionen und wollen sich nicht gegenseitig mit halbfertigem Code stören.
+        </p>
+        <p>
+          Ein <strong>Branch</strong> (Zweig) ist eine eigene Entwicklungslinie. Auf einem Branch kannst du
+          beliebig committen, ohne <code>main</code> zu verändern. Ist die Arbeit fertig, wird der Branch mit
+          <code>main</code> <strong>zusammengeführt</strong> (Merge). Ist das Experiment gescheitert, löschst du den
+          Branch einfach.
+        </p>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Grundregel im Team</div>
+    <code>main</code> enthält immer einen funktionierenden Stand. Neue Arbeit &mdash; Funktionen, Fehlerbehebungen,
+          Experimente &mdash; entsteht auf eigenen Branches.
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>2 — Was ist ein Branch technisch?</h2>
+        <p>
+          Ein Branch ist erstaunlich einfach: ein <strong>beweglicher Name, der auf einen Commit zeigt</strong>.
+          Git speichert dafür nur den Hash des Commits. Einen Branch anzulegen kostet deshalb praktisch
+          nichts &mdash; es werden keine Dateien kopiert.
+        </p>
+        <ul>
+          <li>Wenn du committest, rückt der Branch, auf dem du gerade arbeitest, automatisch auf den neuen Commit vor.</li>
+          <li>Die anderen Branches bleiben stehen, wo sie sind.</li>
+          <li><strong>HEAD</strong> ist ein besonderer Zeiger, der auf den Branch zeigt, auf dem du gerade arbeitest. HEAD bestimmt, welche Dateien in deinem Arbeitsverzeichnis liegen und welcher Branch beim nächsten Commit vorrückt.</li>
+        </ul>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Vorstellung: zwei Branches, HEAD auf feature/hobbys</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext">A ─ B ─ C        ← main
+     \
+      D ─ E    ← feature/hobbys ← HEAD</code></pre>
+</div>
+        <p>Wechselst du zu <code>main</code>, zeigt HEAD auf <code>main</code>, und Git tauscht die Dateien im Arbeitsverzeichnis gegen den Stand von Commit C aus. Wechselst du zurück, sind die Dateien von E wieder da.</p>
+      </section>
+
+      <section class="section">
+        <h2>3 — Branches anlegen, wechseln und löschen</h2>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git branch
+# * main                       ← * markiert den aktuellen Branch
+
+git switch -c feature/hobbys   # neuen Branch anlegen und hinwechseln
+# Switched to a new branch 'feature/hobbys'
+
+# ... Dateien bearbeiten, committen wie gewohnt ...
+git commit -am "Hobbys ergänzt"
+
+git switch main                # zurück zu main
+git log --oneline --all        # Commits aller Branches anzeigen</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td><code>git branch</code></td><td>lokale Branches auflisten</td></tr>
+              <tr><td><code>git branch name</code></td><td>Branch anlegen (ohne zu wechseln)</td></tr>
+              <tr><td><code>git switch name</code></td><td>zu einem Branch wechseln</td></tr>
+              <tr><td><code>git switch -c name</code></td><td>Branch anlegen und wechseln</td></tr>
+              <tr><td><code>git branch -d name</code></td><td>Branch löschen &mdash; nur möglich, wenn er bereits gemergt ist</td></tr>
+              <tr><td><code>git branch -D name</code></td><td>Branch löschen, auch wenn er nicht gemergt ist (Commits gehen verloren!)</td></tr>
+              <tr><td><code>git log --oneline --graph --all</code></td><td>alle Branches als Grafik</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">git checkout</div>
+    <p>In älteren Anleitungen findest du <code>git checkout name</code> und <code>git checkout -b name</code>. Sie bedeuten
+          dasselbe wie <code>git switch</code> bzw. <code>git switch -c</code>. <code>switch</code> gibt es seit Git 2.23 (2019) und ist
+          eindeutiger, weil <code>checkout</code> noch viele andere Aufgaben hat.</p>
+  </div>
+</div>
+        <h3>Branch-Namen</h3>
+        <p>Teams verwenden meist ein Präfix, das den Zweck zeigt, und Kleinbuchstaben mit Bindestrichen:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Präfix</th><th>Zweck</th><th>Beispiel</th></tr></thead>
+            <tbody>
+              <tr><td><code>feature/</code></td><td>neue Funktion</td><td><code>feature/kontaktformular</code></td></tr>
+              <tr><td><code>fix/</code></td><td>Fehlerbehebung</td><td><code>fix/menue-mobil</code></td></tr>
+              <tr><td><code>docs/</code></td><td>Dokumentation</td><td><code>docs/readme-installation</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>4 — Wechseln mit unfertigen Änderungen: git stash</h2>
+        <p>Hast du geänderte, nicht committete Dateien, die sich im Ziel-Branch unterscheiden, verweigert Git den Wechsel &mdash; sonst gingen deine Änderungen verloren:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+# error: Your local changes to the following files would be overwritten by checkout:
+#         style.css
+# Please commit your changes or stash them before you switch branches.
+# Aborting</code></pre>
+</div>
+        <p>Entweder du committest die Änderung, oder du legst sie mit <strong><code>git stash</code></strong> vorübergehend beiseite. Der Stash ist ein Stapel für unfertige Arbeit:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git stash               # Änderungen beiseitelegen, Arbeitsverzeichnis ist wieder sauber
+git switch main
+# ... dringende Korrektur auf main committen ...
+git switch feature/hobbys
+git stash pop           # beiseitegelegte Änderungen zurückholen
+git stash list          # Inhalt des Stapels anzeigen</code></pre>
+</div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Unproblematische Wechsel</div>
+    <p>Ist eine geänderte Datei in beiden Branches gleich, nimmt Git deine Änderung einfach mit in den
+          anderen Branch. Das ist praktisch, wenn du bemerkst, dass du auf dem falschen Branch zu arbeiten
+          begonnen hast: <code>git switch -c richtiger-branch</code> &mdash; die Änderungen wandern mit.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>5 — Merge: Branches zusammenführen</h2>
+        <p>
+          Ein Merge holt die Commits eines anderen Branches in den <strong>aktuellen</strong> Branch. Du
+          wechselst also zuerst in den Branch, der die Änderungen bekommen soll, und nennst dann den
+          Branch, der übernommen wird:
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main              # Ziel
+git merge feature/hobbys     # Quelle</code></pre>
+</div>
+        <p>Je nachdem, was seit dem Abzweigen passiert ist, führt Git den Merge auf eine von zwei Arten durch:</p>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/fast-forward-3way.svg" alt="Fast-Forward: main wird nur vorgeschoben. Three-Way-Merge: ein neuer Merge-Commit verbindet beide Linien." loading="lazy" style="max-width:720px"></div>
+  <figcaption>Fast-Forward: main wird nur vorgeschoben. Three-Way-Merge: ein neuer Merge-Commit verbindet beide Linien.</figcaption>
+</figure>
+        <h3>Fast-Forward</h3>
+        <p>Gab es auf <code>main</code> seit dem Abzweigen keine neuen Commits, muss Git nichts zusammenführen. Es schiebt <code>main</code> einfach auf den letzten Commit des Feature-Branches vor:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git merge feature/hobbys
+# Updating 6c29835..e5b0236
+# Fast-forward
+#  index.html | 2 +-
+#  1 file changed, 1 insertion(+), 1 deletion(-)</code></pre>
+</div>
+        <h3>Three-Way-Merge</h3>
+        <p>
+          Haben <em>beide</em> Branches neue Commits, vergleicht Git drei Stände: den gemeinsamen
+          Vorgänger und die beiden Branch-Enden. Daraus entsteht ein neuer <strong>Merge-Commit</strong> mit
+          zwei Vorgängern. Git schlägt dafür die Message „Merge branch '…'“ vor und öffnet den Editor; mit
+          <code>--no-edit</code> übernimmst du sie direkt:
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git merge feature/hobbys --no-edit
+# Merge made by the 'ort' strategy.
+#  style.css | 1 +
+#  1 file changed, 1 insertion(+)
+
+git log --oneline --graph --all
+# *   f785bae (HEAD -&gt; main) Merge branch 'feature/hobbys'
+# |\
+# | * ceb8dc1 (feature/hobbys) Hobby-Liste gestylt
+# * | 4cecc89 Jahr im Footer aktualisiert
+# |/
+# * e5b0236 Hobbys ergänzt
+# * 6c29835 Steckbrief-Seite angelegt</code></pre>
+</div>
+        <p>Danach ist der Feature-Branch überflüssig: <code>git branch -d feature/hobbys</code>. Seine Commits bleiben über den Merge-Commit in <code>main</code> erhalten.</p>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Wenn beide dieselbe Stelle ändern: Merge-Konflikt</div>
+    <p>Git führt Änderungen an verschiedenen Dateien oder verschiedenen Stellen derselben Datei automatisch zusammen. Wurden aber <strong>dieselben Zeilen</strong> in beiden Branches unterschiedlich geändert, kann Git nicht entscheiden, welche Version gilt, und meldet <em>CONFLICT</em>. Git markiert die Stelle dann in der Datei mit <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> und <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>. Du entscheidest dich für eine Version (oder kombinierst beide), entfernst die Markierungen, und schließt den Merge mit <code>git add</code> und <code>git commit</code> ab. Lektion 2.3 spielt einen solchen Konflikt Schritt für Schritt durch.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>6 — Branches auf GitHub</h2>
+        <p>Branches sind zunächst nur lokal. Damit andere sie sehen (und du sie auf einem anderen Rechner hast), pushst du sie. Beim ersten Push eines Branches verknüpft <code>-u</code> ihn mit dem gleichnamigen Branch am Server:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/kontakt
+# ... committen ...
+git push -u origin feature/kontakt
+# remote: Create a pull request for 'feature/kontakt' on GitHub by visiting:
+# remote:      https://github.com/maxmuster/steckbrief/pull/new/feature/kontakt
+# To https://github.com/maxmuster/steckbrief.git
+#  * [new branch]      feature/kontakt -&gt; feature/kontakt
+# branch 'feature/kontakt' set up to track 'origin/feature/kontakt'.</code></pre>
+</div>
+        <p>
+          Lokal kennt Git danach <strong>Remote-Tracking-Branches</strong> wie <code>origin/feature/kontakt</code>: Gits
+          Erinnerung daran, wo der Branch am Server zuletzt stand. Du bearbeitest sie nie direkt; sie
+          werden bei jedem Kontakt mit dem Server aktualisiert.
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git branch -a          # lokale und Remote-Tracking-Branches
+# * feature/kontakt
+#   main
+#   remotes/origin/feature/kontakt
+#   remotes/origin/main
+
+git branch -vv         # mit Verknüpfung und Abstand zum Server
+# * feature/kontakt bf8240a [origin/feature/kontakt] Kontakt ergänzt
+#   main            f785bae [origin/main: ahead 4] Merge branch 'feature/hobbys'</code></pre>
+</div>
+        <p>„ahead 4“ bedeutet: Der lokale <code>main</code> hat 4 Commits, die am Server noch fehlen &mdash; Zeit für <code>git push</code> auf <code>main</code>. Umgekehrt würde „behind“ heißen, dass am Server neuere Commits liegen.</p>
+        <h3>fetch und pull</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td><code>git fetch</code></td><td>Lädt neue Commits und Branches vom Server und aktualisiert die Remote-Tracking-Branches (<code>origin/…</code>). Deine Branches und Dateien bleiben <strong>unverändert</strong> &mdash; ungefährlich, jederzeit möglich.</td></tr>
+              <tr><td><code>git pull</code></td><td><code>git fetch</code> + Merge von <code>origin/&lt;branch&gt;</code> in den aktuellen Branch. Verändert deinen Branch und deine Dateien.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Mit <code>git fetch</code> und anschließendem <code>git status</code> oder <code>git log --oneline --graph --all</code> siehst du, was am Server passiert ist, bevor du es übernimmst.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aufgabe</th><th>Befehl</th></tr></thead>
+            <tbody>
+              <tr><td>Einen Branch einer Kollegin lokal bearbeiten</td><td><code>git fetch</code>, dann <code>git switch feature/galerie</code> &mdash; Git legt den lokalen Branch automatisch passend zu <code>origin/feature/galerie</code> an</td></tr>
+              <tr><td>Einen Branch am Server löschen</td><td><code>git push origin --delete feature/kontakt</code></td></tr>
+              <tr><td>Am Server gelöschte Branches auch lokal aus <code>origin/…</code> entfernen</td><td><code>git fetch --prune</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 2.1</span>
+    <h3>Hobby-Abschnitt auf einem eigenen Branch</h3>
+  </div>
+<ol>
+            <li>Lege den Branch <code>feature/hobbys</code> an und ergänze eine Liste deiner Hobbys. Committe.</li>
+            <li>Ergänze in <code>style.css</code> eine Regel für die Liste. Committe.</li>
+            <li>Wechsle zu <code>main</code> und aktualisiere dort das Jahr im Footer (eigener Commit). Jetzt haben beide Branches neue Commits.</li>
+            <li>Merge den Feature-Branch in <code>main</code>, sieh dir den Graph an, lösche den Branch und pushe.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">index.html – Ausschnitt</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;h2&gt;Hobbys&lt;/h2&gt;
+&lt;ul class="hobbys"&gt;
+  &lt;li&gt;Klettern&lt;/li&gt;
+  &lt;li&gt;Gitarre&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+</div>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/hobbys
+git commit -am "Hobbys ergänzt"
+git commit -am "Hobby-Liste gestylt"
+git switch main
+git commit -am "Jahr im Footer aktualisiert"
+git merge feature/hobbys --no-edit
+git log --oneline --graph --all
+git branch -d feature/hobbys
+git push</code></pre>
+</div>
+          <p><strong>Ergebnis:</strong> Unter <em>Insights &rarr; Network</em> zeigt GitHub die Verzweigung und den Merge-Commit grafisch.</p>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Merge in die falsche Richtung</div>
+  <p>Auf <code>feature/hobbys</code> wird <code>git merge main</code> ausgeführt, in der Annahme, die Hobbys kämen damit nach <code>main</code>. Tatsächlich hat nur der Feature-Branch die neuen Commits von <code>main</code> bekommen.</p>
+          <p class="fehler-fix">Merge holt Änderungen in den <em>aktuellen</em> Branch. Zuerst in den Ziel-Branch wechseln (<code>git switch main</code>), dann <code>git merge feature/hobbys</code>.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Auf main statt auf dem Feature-Branch gearbeitet</div>
+  <p>Nach einer Pause wird direkt weitergearbeitet &mdash; aber man ist noch auf <code>main</code>. <code>git status</code> zeigt „On branch main“.</p>
+          <p class="fehler-fix">Vor dem Arbeiten Branch prüfen (Statusleiste der IDE, <code>git status</code>). Noch nicht committete Änderungen nimmst du mit <code>git switch -c feature/…</code> auf einen neuen Branch mit.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Neuer Branch fehlt auf GitHub</div>
+  <p><code>git push</code> auf einem neuen Branch meldet <em>fatal: The current branch feature/kontakt has no upstream branch</em>.</p>
+          <p class="fehler-fix">Beim ersten Push den Server-Branch angeben: <code>git push -u origin feature/kontakt</code>. Danach reicht <code>git push</code>.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Zeiger beobachten</span>
+  </div>
+  <p>Lege in einem Übungsrepository zwei Branches an und mache auf jedem zwei Commits. Führe nach jedem Schritt <code>git log --oneline --graph --all</code> aus und beobachte, wo <code>HEAD</code>, <code>main</code> und die Branches stehen. Zeichne den Endzustand als Diagramm wie in Abschnitt 2.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Fast-Forward oder nicht?</span>
+  </div>
+  <p>Erzeuge gezielt beide Merge-Arten: einmal einen Fast-Forward-Merge, einmal einen Three-Way-Merge. Erkläre anhand der Ausgabe von <code>git log --oneline --graph</code>, woran man den Unterschied erkennt. Probiere zusätzlich <code>git merge --no-ff</code> bei einer Fast-Forward-Situation aus: Was passiert?</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Dringende Korrektur</span>
+  </div>
+  <p>Du arbeitest auf <code>feature/galerie</code> und hast nicht committete Änderungen. Auf <code>main</code> muss sofort ein Tippfehler korrigiert und gepusht werden. Spiele die Situation mit <code>git stash</code> durch und schreibe die Befehlsfolge auf.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Learn Git Branching</span>
+  </div>
+  <p>Bearbeite auf <strong>learngitbranching.js.org</strong> im Bereich „Main“ die Levels „Introduction Sequence“ (1–4). Die Seite visualisiert jeden Befehl als Graph.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was ist ein Branch in Git technisch gesehen?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Eine vollständige Kopie aller Dateien in einem eigenen Ordner</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Ein beweglicher Name, der auf einen Commit zeigt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein eigenes Repository auf GitHub</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Eine Liste von Dateien, die gemeinsam geändert werden</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Ein Branch speichert nur den Hash eines Commits. Deshalb ist das Anlegen so schnell und billig. Beim Committen rückt der aktuelle Branch auf den neuen Commit vor.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Du willst die Arbeit aus <code>feature/login</code> in <code>main</code> übernehmen. Welche Befehlsfolge ist richtig?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git switch feature/login</code> und <code>git merge main</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span><code>git switch main</code> und <code>git merge feature/login</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git merge main feature/login</code> auf einem beliebigen Branch</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git push origin feature/login:main</code></span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Merge holt Commits in den aktuellen Branch. Also in den Ziel-Branch <code>main</code> wechseln und den Quell-Branch mergen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Wann führt Git einen <strong>Fast-Forward</strong>-Merge durch?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Wenn es keine Konflikte gibt</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Wenn der Ziel-Branch seit dem Abzweigen keine eigenen neuen Commits hat</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Wenn der Feature-Branch nur einen Commit hat</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Immer, wenn man <code>--no-edit</code> angibt</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Hat sich der Ziel-Branch nicht weiterentwickelt, kann Git seinen Zeiger einfach nach vorne schieben. Sonst entsteht ein Merge-Commit (Three-Way-Merge).</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Was unterscheidet <code>git fetch</code> von <code>git pull</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> aktualisiert nur die Remote-Tracking-Branches, <code>pull</code> übernimmt die Änderungen zusätzlich in den aktuellen Branch.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> lädt hoch, <code>pull</code> lädt herunter.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> funktioniert nur mit SSH.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Es gibt keinen Unterschied.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>git pull</code> = <code>git fetch</code> + Merge. <code>fetch</code> allein verändert weder deine Branches noch deine Dateien.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Welche Aussagen über <strong>HEAD</strong> stimmen?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-5"> <span>HEAD zeigt auf den Branch, auf dem du gerade arbeitest.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-5"> <span>HEAD ist der Name des Servers.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-5"> <span>Beim Commit rückt der Branch vor, auf den HEAD zeigt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-5"> <span>HEAD ist immer der allererste Commit.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> HEAD markiert den aktuellen Branch (und damit den ausgecheckten Commit). Der Server heißt üblicherweise origin.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="1.4-vscode-intellij.html">&larr; Lektion 1.4: Git in VS Code und IntelliJ</a>
+      <span class="nav-center-info">Lektion 2.1</span>
+      <a class="nav-btn primary" href="2.2-rebase-feature-branches.html">Lektion 2.2: Rebase, Feature-Branches &amp; Pull Requests &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

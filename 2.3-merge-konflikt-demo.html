@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.3 &ndash; Demo: Merge-Konflikt mit Alice &amp; Bob | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 2.3 &mdash; Teil 2: Branches &amp; Zusammenarbeit</p>
+      <h1>Demo: Merge-Konflikt mit Alice &amp; Bob</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-gh">Merge-Konflikt</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Grundlagen</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Eine Teamsituation mit zwei Klonen und einem lokalen „Server“-Repository nachstellen</li>
+          <li>Erklären, wann und warum ein Merge-Konflikt entsteht</li>
+          <li>Konfliktmarker lesen und einen Konflikt Schritt für Schritt auflösen</li>
+          <li>Einen abgelehnten Push (<code>rejected</code>) richtig behandeln</li>
+          <li>Einen Konflikt beim Rebase auflösen und den Unterschied zum Merge erklären</li>
+          <li>Strategien nennen, die Konflikte selten und klein halten</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Das Szenario</h2>
+        <p>
+          Alice und Bob betreuen die Website der Schulband. Beide bekommen am selben Tag den Auftrag, die
+          Überschrift der Startseite zu verbessern &mdash; ohne voneinander zu wissen. Beide arbeiten
+          ordnungsgemäß auf einem eigenen Branch. Alice ist zuerst fertig und bringt ihre Änderung nach <code>main</code>.
+          Als Bob danach den aktuellen Stand von <code>main</code> in seinen Branch holt, kracht es.
+        </p>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/alice-bob.svg" alt="Ablauf der Demo: Beide ändern dieselbe Zeile; Bob bekommt beim Merge von main einen Konflikt und löst ihn." loading="lazy" style="max-width:720px"></div>
+  <figcaption>Ablauf der Demo: Beide ändern dieselbe Zeile; Bob bekommt beim Merge von main einen Konflikt und löst ihn.</figcaption>
+</figure>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Alle Ausgaben sind echt</div>
+    <p>Die Demo wurde genau so mit Git 2.43 ausgeführt. Deine Hashes werden anders aussehen, weil sie
+          auch vom Zeitpunkt und Autor abhängen. Spiele die Demo im Terminal mit &mdash; dabei lernst du am meisten.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>2 — Vorbereitung: GitHub lokal simulieren</h2>
+        <p>
+          Damit wir nicht zwei GitHub-Accounts brauchen, ersetzen wir GitHub durch ein
+          <strong>Bare Repository</strong>: ein Repository ohne Arbeitsverzeichnis, das nur den Inhalt von
+          <code>.git</code> enthält &mdash; genau so speichert auch GitHub Repositories. Alice und Bob bekommen je einen
+          Klon in einem eigenen Ordner, als säßen sie an verschiedenen Rechnern. Mit <code>git config</code> ohne
+          <code>--global</code> gilt der Name nur im jeweiligen Repository.
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Vorbereitung</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">mkdir git-demo &amp;&amp; cd git-demo
+git init --bare -b main origin.git        # der „Server“
+
+git clone origin.git alice                # Alice klont
+cd alice
+git config user.name "Alice"
+git config user.email "alice@example.com"</code></pre>
+</div>
+        <p>Alice legt die Startseite an und pusht sie:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">alice/index.html</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;!DOCTYPE html&gt;
+&lt;html lang="de"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Schulband&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Unsere Schulband&lt;/h1&gt;
+  &lt;p&gt;Proben jeden Dienstag.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – im Ordner alice</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git add index.html
+git commit -m "Startseite angelegt"
+git push origin main
+cd ..
+
+git clone origin.git bob                  # jetzt klont Bob
+cd bob
+git config user.name "Bob"
+git config user.email "bob@example.com"
+cd ..</code></pre>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Zwei Terminals</div>
+    <p>Öffne zwei Terminalfenster nebeneinander &mdash; links Alice (<code>cd git-demo/alice</code>), rechts Bob
+          (<code>cd git-demo/bob</code>). So siehst du immer, wer gerade was tut.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>3 — Schritt 1: Beide arbeiten parallel</h2>
+        <p><strong>Alice</strong> legt einen Branch an und ändert die Überschrift auf <code>&lt;h1&gt;Die Schulband der HTL&lt;/h1&gt;</code>:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Alice</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/titel-alice
+# Switched to a new branch 'feature/titel-alice'
+
+# index.html bearbeiten: &lt;h1&gt;Die Schulband der HTL&lt;/h1&gt;
+
+git commit -am "Titel geändert"
+# [feature/titel-alice ca344e0] Titel geändert
+#  1 file changed, 1 insertion(+), 1 deletion(-)</code></pre>
+</div>
+        <p><strong>Bob</strong> tut gleichzeitig dasselbe, findet aber, der Bandname gehört in den Titel: <code>&lt;h1&gt;Schulband „Lautstärke 11“&lt;/h1&gt;</code>:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/titel-bob
+# Switched to a new branch 'feature/titel-bob'
+
+# index.html bearbeiten: &lt;h1&gt;Schulband „Lautstärke 11“&lt;/h1&gt;
+
+git commit -am "Bandnamen in den Titel"
+# [feature/titel-bob 9ec653d] Bandnamen in den Titel
+#  1 file changed, 1 insertion(+), 1 deletion(-)</code></pre>
+</div>
+        <p>Bis hierher ist alles in Ordnung: Jeder hat einen lokalen Commit auf seinem eigenen Branch. Noch weiß keiner vom anderen.</p>
+      </section>
+
+      <section class="section">
+        <h2>4 — Schritt 2: Alice bringt ihre Änderung nach main</h2>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Alice</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+git merge feature/titel-alice
+# Updating f5025e1..ca344e0
+# Fast-forward
+#  index.html | 2 +-
+#  1 file changed, 1 insertion(+), 1 deletion(-)
+
+git push origin main
+# To .../git-demo/origin.git
+#    f5025e1..ca344e0  main -&gt; main</code></pre>
+</div>
+        <p>Da sich <code>main</code> seit dem Abzweigen nicht verändert hatte, war das ein Fast-Forward-Merge. Am „Server“ steht jetzt Alices Überschrift.</p>
+      </section>
+
+      <section class="section">
+        <h2>5 — Schritt 3: Bob holt main &mdash; der Konflikt</h2>
+        <p>Bob ist fertig. Vorbildlich holt er zuerst den aktuellen Stand von <code>main</code> und führt ihn in seinen Branch zusammen, bevor er abgibt:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+git pull
+# From .../git-demo/origin
+#    f5025e1..ca344e0  main       -&gt; origin/main
+# Updating f5025e1..ca344e0
+# Fast-forward
+#  index.html | 2 +-
+
+git switch feature/titel-bob
+git merge main
+# Auto-merging index.html
+# CONFLICT (content): Merge conflict in index.html
+# Automatic merge failed; fix conflicts and then commit the result.</code></pre>
+</div>
+        <p>
+          Beide Branches haben <strong>dieselbe Zeile</strong> geändert &mdash; ausgehend vom gemeinsamen Vorgänger
+          „Unsere Schulband“. Git kann nicht wissen, welche Überschrift die richtige ist. Der Merge ist
+          angehalten; <code>git status</code> sagt genau, was los ist:
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git status
+# On branch feature/titel-bob
+# You have unmerged paths.
+#   (fix conflicts and run "git commit")
+#   (use "git merge --abort" to abort the merge)
+#
+# Unmerged paths:
+#   (use "git add &lt;file&gt;..." to mark resolution)
+#         both modified:   index.html</code></pre>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Keine Panik</div>
+    <p>Ein Konflikt ist kein Fehler, sondern eine Frage von Git an dich: „Welche Version soll gelten?“
+          Es geht nichts verloren. Wer nicht weiterweiß, kehrt mit <code>git merge --abort</code> zum Zustand vor dem
+          Merge zurück.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>6 — Schritt 4: Die Konfliktmarker lesen</h2>
+        <p>Git hat beide Versionen in die Datei geschrieben und mit Markern abgegrenzt:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">bob/index.html – mit Konfliktmarkern</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;!DOCTYPE html&gt;
+&lt;html lang="de"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;Schulband&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+  &lt;h1&gt;Schulband „Lautstärke 11“&lt;/h1&gt;
+=======
+  &lt;h1&gt;Die Schulband der HTL&lt;/h1&gt;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; main
+  &lt;p&gt;Proben jeden Dienstag.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Marker</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code></td><td>Beginn der Version des <strong>aktuellen</strong> Branches (HEAD = <code>feature/titel-bob</code>, also Bobs Version) &mdash; in IDEs „Current Change“ bzw. „Yours“</td></tr>
+              <tr><td><code>=======</code></td><td>Trennlinie zwischen den beiden Versionen</td></tr>
+              <tr><td><code>&gt;&gt;&gt;&gt;&gt;&gt;&gt; main</code></td><td>Ende der Version, die <strong>hereingemergt</strong> wird (aus <code>main</code>, also Alices Version) &mdash; „Incoming Change“ bzw. „Theirs“</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Alles außerhalb der Marker (hier die Absatzzeile) konnte Git automatisch übernehmen. Gibt es mehrere Konfliktstellen in einer Datei, kommt jede mit eigenen Markern vor.</p>
+      </section>
+
+      <section class="section">
+        <h2>7 — Schritt 5: Den Konflikt auflösen</h2>
+        <p>Bob hat drei Möglichkeiten: seine Version behalten, Alices Version übernehmen oder &mdash; meistens das Beste &mdash; beide sinnvoll kombinieren. Nach kurzer Rücksprache mit Alice entscheiden sie sich für eine Kombination. Bob bearbeitet die Datei so, dass sie <strong>genau den gewünschten Endzustand</strong> enthält und <strong>alle Marker entfernt</strong> sind:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">bob/index.html – aufgelöst (Ausschnitt)</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;body&gt;
+  &lt;h1&gt;Lautstärke 11 – die Schulband der HTL&lt;/h1&gt;
+  &lt;p&gt;Proben jeden Dienstag.&lt;/p&gt;
+&lt;/body&gt;</code></pre>
+</div>
+        <p>Mit <code>git add</code> teilt Bob Git mit, dass der Konflikt in dieser Datei gelöst ist. Danach schließt ein Commit den Merge ab:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git add index.html
+git status
+# On branch feature/titel-bob
+# All conflicts fixed but you are still merging.
+#   (use "git commit" to conclude merge)
+#
+# Changes to be committed:
+#         modified:   index.html
+
+git commit --no-edit
+# [feature/titel-bob 3286613] Merge branch 'main' into feature/titel-bob
+
+git log --oneline --graph --all
+# *   3286613 (HEAD -&gt; feature/titel-bob) Merge branch 'main' into feature/titel-bob
+# |\
+# | * ca344e0 (origin/main, main) Titel geändert
+# * | 9ec653d Bandnamen in den Titel
+# |/
+# * f5025e1 Startseite angelegt</code></pre>
+</div>
+        <p><code>--no-edit</code> übernimmt die vorgeschlagene Merge-Message. Der Merge-Commit hat zwei Vorgänger: Bobs Commit und Alices Commit.</p>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Vor dem add: Datei prüfen</div>
+    <p>Git prüft nicht, ob die Marker wirklich entfernt sind &mdash; <code>git add</code> nimmt alles. Suche vor dem
+          <code>git add</code> in der Datei nach <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, öffne die Seite im Browser und teste sie.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>8 — Schritt 6: Abschließen</h2>
+        <p>Bobs Branch enthält jetzt den aktuellen Stand von <code>main</code> plus seine Änderung, der Konflikt ist gelöst. Das Mergen nach <code>main</code> ist dadurch ein konfliktfreier Fast-Forward:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+git merge feature/titel-bob
+# Updating ca344e0..3286613
+# Fast-forward
+#  index.html | 2 +-
+
+git push origin main
+#    ca344e0..3286613  main -&gt; main
+
+git branch -d feature/titel-bob
+# Deleted branch feature/titel-bob (was 3286613).</code></pre>
+</div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Warum nicht direkt in main mergen?</div>
+    <p>Bob hätte auch auf <code>main</code> <code>git merge feature/titel-bob</code> ausführen und den Konflikt dort lösen
+          können. Den Konflikt auf dem Feature-Branch zu lösen hat aber Vorteile: <code>main</code> ist keinen Moment
+          in einem halbfertigen Zustand, und im Team mit Pull Requests (Lektion 2.4) ist es genau dieser
+          Weg &mdash; der Branch wird aktualisiert, bevor er nach <code>main</code> darf.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>9 — Variante: Der abgelehnte Push</h2>
+        <p>Alice ergänzt inzwischen direkt auf <code>main</code> eine Kontaktzeile &mdash; ohne vorher zu pullen. Bobs Merge ist aber schon am Server. Ihr Push wird abgelehnt:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Alice</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git commit -am "Kontakt ergänzt"
+git push origin main
+#  ! [rejected]        main -&gt; main (fetch first)
+# error: failed to push some refs to '.../git-demo/origin.git'
+# hint: Updates were rejected because the remote contains work that you do not
+# hint: have locally. This is usually caused by another repository pushing to
+# hint: the same ref. If you want to integrate the remote changes, use
+# hint: 'git pull' before pushing again.</code></pre>
+</div>
+        <p>Git schützt hier Bobs Arbeit: Ein Push darf am Server nur Commits <em>hinzufügen</em>, nie welche verdrängen. Alice muss zuerst Bobs Commits holen. Ist <code>pull.rebase</code> nicht konfiguriert, verweigert <code>git pull</code> die Arbeit, weil beide Seiten neue Commits haben:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Alice (ohne pull.rebase-Einstellung)</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git pull
+# hint: You have divergent branches and need to specify how to reconcile them.
+# hint:   git config pull.rebase false  # merge
+# hint:   git config pull.rebase true   # rebase
+# hint:   git config pull.ff only       # fast-forward only
+# fatal: Need to specify how to reconcile divergent branches.</code></pre>
+</div>
+        <p>Mit <code>pull.rebase false</code> (Lektion 1.2) entstünde ein Merge-Commit. Für einen einzelnen, noch nicht gepushten Commit ist ein Rebase sauberer (Lektion 2.2):</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Alice</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git pull --rebase
+# Successfully rebased and updated refs/heads/main.
+git push origin main</code></pre>
+</div>
+        <p>Hier gab es keinen Konflikt, weil Alice eine andere Zeile geändert hat. Hätte es einen gegeben, würde Git ihn genau wie im nächsten Abschnitt melden.</p>
+      </section>
+
+      <section class="section">
+        <h2>10 — Variante: Konflikt beim Rebase</h2>
+        <p>Bob startet <code>feature/proben</code> und ergänzt „Proben jeden Dienstag, 15 Uhr.“ Gleichzeitig wird auf <code>main</code> der Probentag auf Mittwoch geändert. Bob aktualisiert seinen Branch diesmal per Rebase:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git rebase main
+# Rebasing (1/1)
+# Auto-merging index.html
+# CONFLICT (content): Merge conflict in index.html
+# error: could not apply 23bbed9... Probenzeit ergänzt
+# hint: Resolve all conflicts manually, mark them as resolved with
+# hint: "git add/rm &lt;conflicted_files&gt;", then run "git rebase --continue".
+# hint: You can instead skip this commit: run "git rebase --skip".
+# hint: To abort and get back to the state before "git rebase", run "git rebase --abort".</code></pre>
+</div>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">bob/index.html – Konflikt beim Rebase (Ausschnitt)</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+  &lt;p&gt;Proben jeden Mittwoch.&lt;/p&gt;
+=======
+  &lt;p&gt;Proben jeden Dienstag, 15 Uhr.&lt;/p&gt;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; 23bbed9 (Probenzeit ergänzt)</code></pre>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Beim Rebase sind die Seiten vertauscht</div>
+    <p>Beim Rebase steht Git auf dem neuen Stand von <code>main</code> und spielt deinen Commit darauf ab. Deshalb
+          ist <strong>HEAD hier der Stand von main</strong>, und deine eigene Änderung erscheint unten als
+          hereinkommender Commit. In IDEs heißt deine Version dann „Incoming“ &mdash; genau umgekehrt wie beim Merge.</p>
+  </div>
+</div>
+        <p>Bob kombiniert beide Informationen zu „Proben jeden Mittwoch, 15 Uhr.“, entfernt die Marker und setzt fort:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Bob</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git add index.html
+git rebase --continue          # öffnet ggf. den Editor für die Message – speichern und schließen
+# [detached HEAD 0c3a524] Probenzeit ergänzt
+# Successfully rebased and updated refs/heads/feature/proben.
+
+git log --oneline --graph
+# * 0c3a524 (HEAD -&gt; feature/proben) Probenzeit ergänzt
+# * 562e58c (main) Probentag geändert
+# * b15a50e Kontakt ergänzt
+# ...</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>Konflikt beim Merge</th><th>Konflikt beim Rebase</th></tr></thead>
+            <tbody>
+              <tr><td>HEAD / „Current“ ist …</td><td>dein Branch</td><td>der Branch, auf den du rebasest (z.&nbsp;B. main)</td></tr>
+              <tr><td>Nach dem Lösen</td><td><code>git add</code> + <code>git commit</code></td><td><code>git add</code> + <code>git rebase --continue</code></td></tr>
+              <tr><td>Abbrechen</td><td><code>git merge --abort</code></td><td><code>git rebase --abort</code></td></tr>
+              <tr><td>Wie oft?</td><td>einmal</td><td>evtl. bei mehreren Commits nacheinander</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>11 — Konflikte in VS Code und IntelliJ lösen</h2>
+        <div class="two-col">
+          <div>
+            <h3 class="mt-0">VS Code</h3>
+            <p>Konfliktdateien stehen in Source Control unter <strong>Merge Changes</strong> (Buchstabe <strong>!</strong>). Im Editor erscheinen über jedem Konflikt die Links <strong>Accept Current Change</strong>, <strong>Accept Incoming Change</strong>, <strong>Accept Both Changes</strong> und <strong>Compare Changes</strong>. Mit <strong>Resolve in Merge Editor</strong> öffnet sich eine Drei-Fenster-Ansicht (Incoming, Current, Result). Danach <strong>+</strong> (= <code>git add</code>) und committen.</p>
+          </div>
+          <div>
+            <h3 class="mt-0">IntelliJ IDEA</h3>
+            <p>Bei einem Konflikt öffnet sich der Dialog <strong>Conflicts</strong> mit <strong>Accept Yours</strong>, <strong>Accept Theirs</strong> und <strong>Merge…</strong>. Das Merge-Fenster zeigt links deine Version, rechts die andere, in der Mitte das Ergebnis; mit den Pfeilen übernimmst du einzelne Blöcke. Der Zauberstab übernimmt alle konfliktfreien Änderungen. <strong>Apply</strong> schließt ab.</p>
+          </div>
+        </div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Eine ganze Datei übernehmen</div>
+    <p>Soll bei einer Datei komplett eine Seite gewinnen (z.&nbsp;B. bei einer generierten Datei), geht das im Terminal mit <code>git checkout --ours datei</code> bzw. <code>git checkout --theirs datei</code> und anschließendem <code>git add datei</code>. Beim Rebase sind auch hier ours und theirs vertauscht.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>12 — Konflikte vermeiden</h2>
+        <p>Konflikte lassen sich nicht ganz verhindern, aber selten und klein halten:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Maßnahme</th><th>Warum</th></tr></thead>
+            <tbody>
+              <tr><td>Oft pullen, <code>main</code> regelmäßig in den Branch holen</td><td>Kleine Unterschiede sind schnell zusammengeführt, große nicht.</td></tr>
+              <tr><td>Kurze Branches, kleine Commits</td><td>Je kürzer ein Branch lebt, desto weniger kann sich auf <code>main</code> ändern.</td></tr>
+              <tr><td>Aufgaben im Team absprechen</td><td>Wer weiß, wer an welcher Datei arbeitet, ändert nicht gleichzeitig dieselbe Stelle (Alice und Bob hätten das gebraucht).</td></tr>
+              <tr><td>Keine unnötigen Massenänderungen</td><td>Ganze Dateien neu formatieren oder Einrückungen ändern erzeugt Konflikte in jeder Zeile.</td></tr>
+              <tr><td>Einheitliche Formatierung (z.&nbsp;B. Prettier, IDE-Einstellungen)</td><td>Sonst formatiert jeder die Datei anders, und Git sieht überall Änderungen.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 2.3</span>
+    <h3>Einen Konflikt im eigenen Steckbrief erzeugen und lösen</h3>
+  </div>
+<p>Du brauchst zwei Klone deines Repositorys <code>steckbrief</code> (z.&nbsp;B. <code>steckbrief</code> und <code>steckbrief-2</code> aus Aufgabe 3 der Lektion 1.2). Du spielst beide Rollen.</p>
+          <ol>
+            <li>Im ersten Klon: Branch <code>feature/titel-a</code>, <code>&lt;h1&gt;</code> ändern, committen, in <code>main</code> mergen, pushen.</li>
+            <li>Im zweiten Klon: zuerst <code>git switch main</code> und <code>git pull</code> <strong>nicht</strong> ausführen! Branch <code>feature/titel-b</code>, dieselbe <code>&lt;h1&gt;</code>-Zeile anders ändern, committen.</li>
+            <li>Im zweiten Klon: <code>main</code> pullen, in <code>feature/titel-b</code> <code>git merge main</code> &mdash; Konflikt.</li>
+            <li>Konflikt lösen (Terminal oder IDE), committen, nach <code>main</code> mergen, pushen, Branch löschen.</li>
+            <li>Im ersten Klon <code>git pull</code> und mit <code>git log --oneline --graph</code> kontrollieren.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – zweiter Klon</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/titel-b
+git commit -am "Titel mit Klasse ergänzt"
+git switch main &amp;&amp; git pull
+git switch feature/titel-b
+git merge main               # CONFLICT
+# index.html bearbeiten, Marker entfernen
+git add index.html
+git commit --no-edit
+git switch main
+git merge feature/titel-b
+git push
+git branch -d feature/titel-b</code></pre>
+</div>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Konfliktmarker committet</div>
+  <p>Die Seite zeigt plötzlich <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> und zwei Überschriften. Die Datei wurde mit <code>git add .</code> vorgemerkt, bevor die Marker entfernt waren.</p>
+          <p class="fehler-fix">Vor dem <code>git add</code> die Datei nach <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> und <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> durchsuchen und die Seite testen. Wurde schon committet: Marker entfernen und als neuen Commit nachreichen.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: „Accept Both“ ohne nachzudenken</div>
+  <p>In VS Code wurde „Accept Both Changes“ geklickt. Die Seite hat jetzt zwei <code>&lt;h1&gt;</code>-Überschriften untereinander.</p>
+          <p class="fehler-fix">„Accept Both“ setzt nur beide Blöcke hintereinander. Das Ergebnis immer lesen und so bearbeiten, dass es inhaltlich stimmt.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Den Push erzwingen</div>
+  <p>Der Push wird mit <em>rejected</em> abgelehnt, und man versucht es mit <code>git push --force</code>. Damit sind die Commits der anderen am Server gelöscht.</p>
+          <p class="fehler-fix">Ein abgelehnter Push heißt: Zuerst die neuen Commits holen (<code>git pull</code> bzw. <code>git pull --rebase</code>), eventuelle Konflikte lösen, dann normal pushen.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Demo nachspielen</span>
+  </div>
+  <p>Spiele die Abschnitte 2–8 vollständig nach. Löse den Konflikt dabei einmal im Terminal und &mdash; nach <code>git merge --abort</code> und erneutem <code>git merge main</code> &mdash; einmal im Merge-Editor von VS Code oder IntelliJ.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Zwei Konfliktstellen</span>
+  </div>
+  <p>Erweitere die Demo: Alice und Bob ändern beide die Überschrift <strong>und</strong> den Probentag, Bob zusätzlich eine dritte Zeile, die Alice nicht anrührt. Wie viele Konfliktstellen meldet Git? Welche Zeile führt Git automatisch zusammen?</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Konflikt bei gelöschter Datei</span>
+  </div>
+  <p>Alice löscht <code>impressum.html</code> und pusht, Bob ändert gleichzeitig eine Zeile darin. Was meldet Git beim Merge? Wie sieht <code>git status</code> aus? Löse den Konflikt einmal mit <code>git rm</code>, einmal mit <code>git add</code>.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Demo als Skript</span>
+  </div>
+  <p>Schreibe ein Bash-Skript <code>konflikt-demo.sh</code>, das die komplette Vorbereitung und die Schritte 1–3 automatisch ausführt und mit dem Konflikt stehen bleibt (Tipp: Dateiinhalte mit <code>cat &gt; index.html &lt;&lt;'EOF'</code> schreiben, Zeilen mit <code>sed -i</code> ersetzen). Damit kannst du die Situation jederzeit neu erzeugen und üben.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Wann entsteht ein Merge-Konflikt?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Immer, wenn zwei Personen dieselbe Datei geändert haben</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Wenn beide Seiten dieselben Zeilen (bzw. benachbarte Zeilen) einer Datei unterschiedlich geändert haben</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Wenn ein Branch älter als eine Woche ist</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Wenn der Push abgelehnt wird</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Änderungen an verschiedenen Stellen derselben Datei führt Git automatisch zusammen. Nur bei überlappenden Änderungen muss ein Mensch entscheiden.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Bob führt auf <code>feature/titel-bob</code> <code>git merge main</code> aus. Was steht zwischen <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> und <code>=======</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Bobs Version aus <code>feature/titel-bob</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Alices Version aus <code>main</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Version des gemeinsamen Vorgängers</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Commit-Message</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Beim Merge ist HEAD der aktuelle Branch &ndash; hier Bobs Feature-Branch. Unter der Trennlinie steht die hereingemergte Version aus main.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Welche Schritte gehören zum Auflösen eines Konflikts beim <strong>Merge</strong>?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Datei bearbeiten und alle Konfliktmarker entfernen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span><code>git add datei</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span><code>git commit</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span><code>git push --force</code></span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Bearbeiten, mit <code>git add</code> als gelöst markieren, mit <code>git commit</code> den Merge abschließen. Ein Force-Push ist dafür nie nötig.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Dein Push wird mit <em>rejected (fetch first)</em> abgelehnt. Was ist der richtige nächste Schritt?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>git push --force</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Die neuen Commits vom Server holen (<code>git pull</code> bzw. <code>git pull --rebase</code>) und danach erneut pushen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Das Repository neu klonen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Den letzten Commit mit <code>git revert</code> rückgängig machen</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Am Server liegen Commits, die du lokal nicht hast. Git verhindert, dass du sie überschreibst. Erst integrieren, dann pushen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Was ist beim Konflikt während eines <strong>Rebase</strong> anders als beim Merge?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Konflikte können beim Rebase nicht auftreten.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>HEAD ist der Branch, auf den rebased wird, und man setzt mit <code>git rebase --continue</code> fort.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Man muss die Konfliktmarker nicht entfernen.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Git wählt automatisch die neuere Version.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Beim Rebase werden deine Commits auf den neuen Stand abgespielt; deshalb sind die Seiten vertauscht. Nach dem Lösen: <code>git add</code> und <code>git rebase --continue</code>.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="2.2-rebase-feature-branches.html">&larr; Lektion 2.2: Rebase, Feature-Branches &amp; Pull Requests</a>
+      <span class="nav-center-info">Lektion 2.3</span>
+      <a class="nav-btn primary" href="2.4-pull-requests.html">Lektion 2.4: Pull Requests auf GitHub &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

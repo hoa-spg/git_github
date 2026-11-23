@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.4 &ndash; Git in VS Code und IntelliJ | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 1.4 &mdash; Teil 1: Git-Grundlagen &amp; Werkzeuge</p>
+      <h1>Git in VS Code und IntelliJ</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-git">Werkzeuge</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Grundlagen</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Ein GitHub-Repository direkt aus VS Code und aus IntelliJ IDEA klonen</li>
+          <li>Änderungen in der IDE ansehen, vormerken, committen, pushen und pullen</li>
+          <li>Die Farben und Symbole für Dateizustände in beiden IDEs deuten</li>
+          <li>Branch und Commit-Historie in der IDE ablesen</li>
+          <li>Jede IDE-Aktion dem passenden Git-Befehl zuordnen</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Die IDE verwendet dein Git</h2>
+        <p>
+          VS Code und IntelliJ haben kein eigenes Git eingebaut: Sie rufen im Hintergrund das Git auf,
+          das du in Lektion 1.2 installiert hast, und verwenden auch dessen Einstellungen
+          (<code>user.name</code>, <code>user.email</code>). Jede Schaltfläche entspricht also einem Befehl, den du schon kennst.
+          Deshalb gilt:
+        </p>
+        <ul>
+          <li>Was du in der IDE tust, siehst du auch mit <code>git status</code> und <code>git log</code> im Terminal &mdash; und umgekehrt.</li>
+          <li>Wenn die IDE einmal eine unverständliche Meldung zeigt, hilft ein Blick ins Terminal.</li>
+          <li>Öffne in der IDE immer den <strong>Repository-Ordner</strong> (den mit <code>.git</code> darin), nicht einen Ordner darüber.</li>
+        </ul>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Terminal in der IDE</div>
+    <p>Beide IDEs haben ein eingebautes Terminal: VS Code <kbd>Strg</kbd>+<kbd>ö</kbd> (US-Tastatur
+          <kbd>Ctrl</kbd>+<kbd>`</kbd>), IntelliJ <kbd>Alt</kbd>+<kbd>F12</kbd>. Es startet direkt im Projektordner.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>2 — VS Code: Klonen und die Ansicht „Source Control“</h2>
+        <h3>Klonen</h3>
+        <ol>
+          <li>Befehlspalette öffnen: <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> (macOS <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>P</kbd>).</li>
+          <li><strong>Git: Clone</strong> eingeben &rarr; <strong>Clone from GitHub</strong> (beim ersten Mal meldest du dich im Browser bei GitHub an) oder die URL einfügen.</li>
+          <li>Zielordner wählen, danach <strong>Open</strong> klicken.</li>
+        </ol>
+        <figure class="figure">
+  <div class="figure-img dark-bg"><img src="assets/img/vscode-clone.png" alt="Befehlspalette nach „Git: Clone“: URL einfügen oder „Clone from GitHub“ wählen" loading="lazy" style="max-width:760px"></div>
+  <figcaption>Befehlspalette nach „Git: Clone“: URL einfügen oder „Clone from GitHub“ wählen</figcaption>
+</figure>
+        <h3>Die Ansicht Source Control</h3>
+        <p>Über das Verzweigungssymbol in der linken Leiste oder <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd> öffnest du die Git-Ansicht. Sie zeigt den Inhalt von <code>git status</code> grafisch:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Element</th><th>Bedeutung</th><th>Git-Befehl</th></tr></thead>
+            <tbody>
+              <tr><td>Gruppe <strong>Changes</strong></td><td>geänderte, nicht vorgemerkte Dateien</td><td><code>git status</code></td></tr>
+              <tr><td>Gruppe <strong>Staged Changes</strong></td><td>vorgemerkte Dateien</td><td><code>git status</code></td></tr>
+              <tr><td>Buchstabe <strong>U</strong> / <strong>M</strong> / <strong>D</strong> / <strong>A</strong></td><td>untracked / modified / deleted / added (neu vorgemerkt)</td><td><code>git status -s</code></td></tr>
+              <tr><td>Klick auf eine Datei</td><td>Vergleich alt/neu nebeneinander</td><td><code>git diff</code></td></tr>
+              <tr><td><strong>+</strong> neben der Datei</td><td>Stage Changes</td><td><code>git add datei</code></td></tr>
+              <tr><td><strong>&minus;</strong> neben der Datei (in Staged Changes)</td><td>Unstage Changes</td><td><code>git restore --staged datei</code></td></tr>
+              <tr><td>Pfeil zurück neben der Datei</td><td>Discard Changes &mdash; Änderung verwerfen!</td><td><code>git restore datei</code></td></tr>
+              <tr><td>Textfeld + <strong>Commit</strong> (<kbd>Strg</kbd>+<kbd>Enter</kbd>)</td><td>Commit mit dieser Message</td><td><code>git commit -m "…"</code></td></tr>
+              <tr><td><strong>Sync Changes</strong></td><td>erst pullen, dann pushen</td><td><code>git pull</code> + <code>git push</code></td></tr>
+              <tr><td>Menü <strong>…</strong> &rarr; Pull, Push, Clone, Branch, Stash …</td><td>weitere Befehle</td><td>&mdash;</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="figure">
+  <div class="figure-img dark-bg"><img src="assets/img/vscode-source-control.png" alt="Source Control in VS Code: style.css ist vorgemerkt (Staged Changes), index.html geändert (M), kontakt.html neu und noch nicht verfolgt (U). Darunter der Graph mit der Commit-Historie, rechts die grünen Balken im Editor-Rand." loading="lazy" style="max-width:900px"></div>
+  <figcaption>Source Control in VS Code: style.css ist vorgemerkt (Staged Changes), index.html geändert (M), kontakt.html neu und noch nicht verfolgt (U). Darunter der Graph mit der Commit-Historie, rechts die grünen Balken im Editor-Rand.</figcaption>
+</figure>
+        <figure class="figure">
+  <div class="figure-img dark-bg"><img src="assets/img/vscode-diff.png" alt="Klick auf index.html: links der Stand des letzten Commits, rechts die aktuelle Datei mit den neuen Zeilen (grün)" loading="lazy" style="max-width:900px"></div>
+  <figcaption>Klick auf index.html: links der Stand des letzten Commits, rechts die aktuelle Datei mit den neuen Zeilen (grün)</figcaption>
+</figure>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Smart Commit</div>
+    <p>Ist nichts vorgemerkt und du klickst auf <strong>Commit</strong>, fragt VS Code, ob alle Änderungen
+          vorgemerkt und committet werden sollen. Mit „Always“ passiert das künftig ohne Rückfrage &mdash;
+          dann landen leicht Dateien im Commit, die du nicht wolltest. Besser gezielt mit <strong>+</strong> vormerken.</p>
+  </div>
+</div>
+        <h3>Weitere Anzeigen</h3>
+        <ul>
+          <li><strong>Statusleiste unten links:</strong> der aktuelle Branch (z.&nbsp;B. <code>main</code>), daneben Zähler wie <code>1↓ 2↑</code>: 1 Commit am Server noch nicht geholt, 2 lokale Commits noch nicht gepusht.</li>
+          <li><strong>Farbige Balken im Editor-Rand:</strong> grün = neue Zeilen, blau = geänderte Zeilen, rotes Dreieck = gelöschte Zeilen seit dem letzten Commit.</li>
+          <li><strong>Graph</strong> im unteren Teil der Source-Control-Ansicht: die Commit-Historie als Grafik (wie <code>git log --graph</code>).</li>
+          <li><strong>Timeline</strong> im Explorer: die Commits, die die gerade geöffnete Datei verändert haben.</li>
+        </ul>
+        <figure class="figure">
+  <div class="figure-img dark-bg"><img src="assets/img/vscode-graph-ahead.png" alt="Nach einem Commit: Der Graph zeigt „Outgoing Changes“ – main ist origin/main einen Commit voraus, die Statusleiste unten zeigt „0↓ 1↑“" loading="lazy" style="max-width:340px"></div>
+  <figcaption>Nach einem Commit: Der Graph zeigt „Outgoing Changes“ – main ist origin/main einen Commit voraus, die Statusleiste unten zeigt „0↓ 1↑“</figcaption>
+</figure>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Nützliche Erweiterungen</div>
+    <strong>GitLens</strong> zeigt bei jeder Zeile, wer sie wann geändert hat (<code>git blame</code>).
+          <strong>GitHub Pull Requests</strong> erlaubt es, Pull Requests (Lektion 2.4) direkt in VS Code zu prüfen.
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>3 — IntelliJ IDEA: Klonen und das Commit-Fenster</h2>
+        <h3>Klonen</h3>
+        <ol>
+          <li>Im Willkommensbildschirm <strong>Clone Repository</strong> oder im Menü <strong>File &rarr; New &rarr; Project from Version Control</strong>.</li>
+          <li>Links <strong>GitHub</strong> wählen, <strong>Log In via GitHub</strong> &mdash; die Anmeldung erfolgt im Browser. Danach erscheinen deine Repositories in einer Liste. Alternativ links <strong>Repository URL</strong> und die URL einfügen.</li>
+          <li>Zielordner prüfen, <strong>Clone</strong>, danach das Projekt öffnen und vertrauen („Trust Project“).</li>
+        </ol>
+        <p>Den GitHub-Account kannst du auch später unter <strong>Settings &rarr; Version Control &rarr; GitHub</strong> hinzufügen. Ein bestehendes Projekt ohne Git machst du mit <strong>VCS &rarr; Create Git Repository</strong> zu einem Repository (entspricht <code>git init</code>).</p>
+        <h3>Das Commit-Fenster</h3>
+        <p>Mit <kbd>Strg</kbd>+<kbd>K</kbd> (macOS <kbd>⌘</kbd>+<kbd>K</kbd>) oder dem Symbol <strong>Commit</strong> in der linken Leiste (<kbd>Alt</kbd>+<kbd>0</kbd>) öffnest du das Commit-Fenster:</p>
+        <ul>
+          <li><strong>Changes:</strong> alle geänderten Dateien mit <strong>Häkchen</strong>. Nur angehakte Dateien kommen in den Commit &mdash; die Häkchen ersetzen hier die Staging Area.</li>
+          <li><strong>Unversioned Files:</strong> neue Dateien, die Git noch nicht verfolgt. Anhaken = <code>git add</code>.</li>
+          <li>Doppelklick auf eine Datei (oder <kbd>Strg</kbd>+<kbd>D</kbd>): Vergleich alt/neu.</li>
+          <li>Darunter das Feld für die Commit-Message und die Schaltflächen <strong>Commit</strong> sowie <strong>Commit and Push…</strong>.</li>
+        </ul>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/intellij-commit.png" alt="Commit-Fenster in IntelliJ: index.html ist angehakt und kommt in den Commit, kontakt.html liegt unter Unversioned Files. Rechts der Vergleich alt/neu, unten die Commit-Message." loading="lazy" style="max-width:900px"></div>
+  <figcaption>Commit-Fenster in IntelliJ: index.html ist angehakt und kommt in den Commit, kontakt.html liegt unter Unversioned Files. Rechts der Vergleich alt/neu, unten die Commit-Message.</figcaption>
+</figure>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Farbe des Dateinamens</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><span style="color:#d9534f">rot</span></td><td>unversioned (untracked)</td></tr>
+              <tr><td><span style="color:#3fb950">grün</span></td><td>neu hinzugefügt, noch nicht committet</td></tr>
+              <tr><td><span style="color:#58a6ff">blau</span></td><td>geändert seit dem letzten Commit</td></tr>
+              <tr><td>grau / oliv</td><td>von <code>.gitignore</code> ignoriert</td></tr>
+              <tr><td>normal</td><td>unverändert</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Push, Pull, Historie</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aktion</th><th>Tastenkürzel (Win/Linux · macOS)</th><th>Git-Befehl</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Push…</strong> &mdash; zeigt vorher die Liste der zu pushenden Commits</td><td><kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> · <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>K</kbd></td><td><code>git push</code></td></tr>
+              <tr><td><strong>Update Project</strong> &mdash; holt und übernimmt neue Commits</td><td><kbd>Strg</kbd>+<kbd>T</kbd> · <kbd>⌘</kbd>+<kbd>T</kbd></td><td><code>git pull</code></td></tr>
+              <tr><td>Werkzeugfenster <strong>Git</strong>, Reiter <strong>Log</strong>: Commit-Graph, Suche, Diff je Commit</td><td><kbd>Alt</kbd>+<kbd>9</kbd> · <kbd>⌘</kbd>+<kbd>9</kbd></td><td><code>git log --graph</code></td></tr>
+              <tr><td>Rechtsklick in den Editor-Rand &rarr; <strong>Annotate with Git Blame</strong></td><td>&mdash;</td><td><code>git blame</code></td></tr>
+              <tr><td>Rechtsklick auf Datei &rarr; <strong>Git &rarr; Rollback</strong></td><td><kbd>Strg</kbd>+<kbd>Alt</kbd>+<kbd>Z</kbd> · <kbd>⌘</kbd>+<kbd>⌥</kbd>+<kbd>Z</kbd></td><td><code>git restore datei</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/intellij-push.png" alt="Push-Dialog: links die Commits, die zu origin/main hochgeladen werden, rechts die betroffenen Dateien" loading="lazy" style="max-width:700px"></div>
+  <figcaption>Push-Dialog: links die Commits, die zu origin/main hochgeladen werden, rechts die betroffenen Dateien</figcaption>
+</figure>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/intellij-log.png" alt="Git-Werkzeugfenster, Reiter Log: links lokale und Remote-Branches, rechts die Commit-Historie als Graph" loading="lazy" style="max-width:900px"></div>
+  <figcaption>Git-Werkzeugfenster, Reiter Log: links lokale und Remote-Branches, rechts die Commit-Historie als Graph</figcaption>
+</figure>
+        <p>Den aktuellen Branch zeigt IntelliJ oben links in der Titelleiste neben dem Projektnamen. Ein Klick darauf öffnet das Branch-Menü (neuer Branch, wechseln, mergen &mdash; Lektion 2.1).</p>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/intellij-branch.png" alt="Branch-Menü in der Titelleiste: Update Project, Commit und Push mit Tastenkürzeln, darunter neue Branches und die vorhandenen Branches" loading="lazy" style="max-width:560px"></div>
+  <figcaption>Branch-Menü in der Titelleiste: Update Project, Commit und Push mit Tastenkürzeln, darunter neue Branches und die vorhandenen Branches</figcaption>
+</figure>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Local History</div>
+    <p>Unabhängig von Git merkt sich IntelliJ jede Änderung der letzten Tage: Rechtsklick auf Datei
+          &rarr; <strong>Local History &rarr; Show History</strong>. Das rettet auch Änderungen, die nie committet wurden.</p>
+  </div>
+</div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Der Ordner .idea</div>
+    <p>IntelliJ speichert Projekteinstellungen im Ordner <code>.idea</code>. In Schulprojekten trägst du ihn am
+          einfachsten in die <code>.gitignore</code> ein (Lektion 1.3), damit sich die Einstellungen verschiedener
+          Rechner nicht gegenseitig überschreiben.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>4 — Gegenüberstellung</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Aufgabe</th><th>Terminal</th><th>VS Code</th><th>IntelliJ IDEA</th></tr></thead>
+            <tbody>
+              <tr><td>Klonen</td><td><code>git clone url</code></td><td>Befehlspalette &rarr; Git: Clone</td><td>Clone Repository / Project from Version Control</td></tr>
+              <tr><td>Status ansehen</td><td><code>git status</code></td><td>Source Control (<kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>)</td><td>Commit-Fenster (<kbd>Alt</kbd>+<kbd>0</kbd>)</td></tr>
+              <tr><td>Änderung ansehen</td><td><code>git diff</code></td><td>Klick auf Datei</td><td>Doppelklick / <kbd>Strg</kbd>+<kbd>D</kbd></td></tr>
+              <tr><td>Vormerken</td><td><code>git add</code></td><td><strong>+</strong></td><td>Häkchen</td></tr>
+              <tr><td>Committen</td><td><code>git commit -m</code></td><td>Message + <kbd>Strg</kbd>+<kbd>Enter</kbd></td><td>Message + Commit (<kbd>Strg</kbd>+<kbd>K</kbd>)</td></tr>
+              <tr><td>Pushen</td><td><code>git push</code></td><td>Sync Changes / … &rarr; Push</td><td><kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd></td></tr>
+              <tr><td>Pullen</td><td><code>git pull</code></td><td>Sync Changes / … &rarr; Pull</td><td><kbd>Strg</kbd>+<kbd>T</kbd></td></tr>
+              <tr><td>Historie</td><td><code>git log --oneline --graph</code></td><td>Graph / Timeline</td><td>Git-Fenster &rarr; Log (<kbd>Alt</kbd>+<kbd>9</kbd>)</td></tr>
+              <tr><td>Branch anzeigen/wechseln</td><td><code>git branch</code>, <code>git switch</code></td><td>Statusleiste unten links</td><td>Titelleiste oben links</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Terminal oder IDE?</div>
+    <p>Für das tägliche Vormerken, Committen und Ansehen von Diffs ist die IDE bequem und übersichtlich.
+          Das Terminal bleibt wichtig: Es zeigt ausführliche Meldungen, funktioniert überall (auch auf
+          Servern ohne grafische Oberfläche) und alle Anleitungen im Internet verwenden die Befehle.
+          Wer beides kann, versteht, was die IDE tut.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 1.4</span>
+    <h3>Eine Änderung komplett in der IDE</h3>
+  </div>
+<ol>
+            <li>Öffne den Ordner <code>steckbrief</code> in VS Code (<strong>File &rarr; Open Folder</strong>) oder IntelliJ (<strong>File &rarr; Open</strong>).</li>
+            <li>Ergänze in <code>index.html</code> einen Footer und beobachte die farbigen Markierungen im Editor-Rand bzw. die Dateifarbe.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">index.html – vor &lt;/body&gt;</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;footer&gt;
+  &lt;p&gt;&amp;copy; 2026 Max Muster&lt;/p&gt;
+&lt;/footer&gt;</code></pre>
+</div>
+          <ol start="3">
+            <li>Sieh dir den Diff in der IDE an, merke die Datei vor (VS Code: <strong>+</strong>, IntelliJ: Häkchen) und committe mit der Message „Footer ergänzt“.</li>
+            <li>Beobachte vor dem Push die Anzeige <code>0↓ 1↑</code> (VS Code) bzw. die Commit-Liste im Push-Dialog (IntelliJ). Pushe dann.</li>
+            <li>Kontrolliere im Terminal mit <code>git log --oneline</code> und auf GitHub, dass der Commit angekommen ist.</li>
+          </ol>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Den falschen Ordner geöffnet</div>
+  <p>VS Code zeigt „The folder currently open doesn't have a git repository“ oder IntelliJ bietet keine Git-Funktionen an &mdash; geöffnet wurde der Ordner <em>über</em> dem Repository oder ein Unterordner einer anderen Struktur.</p>
+          <p class="fehler-fix">Genau den Ordner öffnen, der <code>.git</code> enthält (bei einem Klon: der Ordner mit dem Repository-Namen).</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Committet, aber nicht gepusht</div>
+  <p>Nach dem Klick auf <strong>Commit</strong> denkt man, die Arbeit sei „abgegeben“. Auf GitHub fehlt sie aber; VS Code zeigt in der Statusleiste <code>0↓ 1↑</code>.</p>
+          <p class="fehler-fix">Commit speichert nur lokal. Danach <strong>Sync Changes</strong> bzw. Push (<kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd>) &mdash; oder in IntelliJ gleich <strong>Commit and Push…</strong>.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Neue Datei nicht angehakt</div>
+  <p>In IntelliJ wurde <code>galerie.html</code> neu angelegt, die Frage „Add file to Git?“ mit „Cancel“ beantwortet. Die Datei bleibt unter <em>Unversioned Files</em> und fehlt im Commit.</p>
+          <p class="fehler-fix">Vor dem Commit die Gruppe <strong>Unversioned Files</strong> prüfen und benötigte Dateien anhaken (oder Rechtsklick &rarr; Git &rarr; Add).</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Eine Datei, zwei Commits</span>
+  </div>
+  <p>Ändere in <code>index.html</code> zwei Stellen, die nichts miteinander zu tun haben (z.&nbsp;B. Titel und Footer). Committe sie in VS Code als <strong>zwei getrennte Commits</strong>: Im Diff-Editor kannst du markierte Zeilen per Rechtsklick &rarr; <strong>Stage Selected Ranges</strong> einzeln vormerken. Prüfe das Ergebnis mit <code>git log -p -2</code>.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Rückgängig in der IDE</span>
+  </div>
+  <p>Ändere eine Datei und verwirf die Änderung in der IDE (VS Code: Discard Changes, IntelliJ: Rollback). Merke danach eine Datei vor und nimm sie wieder aus der Staging Area. Notiere zu jeder Aktion den entsprechenden Git-Befehl.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Die andere IDE</span>
+  </div>
+  <p>Klone dein Repository mit der IDE, die du noch nicht verwendet hast, in einen zweiten Ordner. Ändere etwas, committe und pushe. Hole die Änderung dann in der ersten IDE (Sync bzw. Update Project). Vergleiche die Commit-Graphen beider IDEs.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Git-Ausgabe der IDE</span>
+  </div>
+  <p>Beide IDEs protokollieren die Git-Befehle, die sie ausführen: VS Code im Panel <strong>Output</strong> (Auswahl „Git“), IntelliJ im Git-Werkzeugfenster im Reiter <strong>Console</strong>. Führe einen Commit und einen Push in der IDE aus und finde die zugehörigen Befehle im Protokoll.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was macht die Schaltfläche <strong>Sync Changes</strong> in VS Code?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Sie committet alle Änderungen.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Sie führt einen Pull und anschließend einen Push aus.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Sie synchronisiert die Einstellungen von VS Code mit GitHub.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Sie verwirft alle lokalen Änderungen.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Sync = pull + push: zuerst die neuen Commits vom Server holen, dann die eigenen hochladen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> In IntelliJ ist ein Dateiname <strong>rot</strong> dargestellt. Was bedeutet das?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Datei enthält Syntaxfehler.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Datei hat einen Merge-Konflikt.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Die Datei ist unversioned &ndash; Git verfolgt sie noch nicht.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Datei wurde gelöscht.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Rot = unversioned (untracked), grün = neu hinzugefügt, blau = geändert.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> VS Code zeigt in der Statusleiste <code>main 0↓ 2↑</code>. Was gilt?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Zwei Commits am Server wurden noch nicht geholt.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Zwei lokale Commits wurden noch nicht gepusht.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Zwei Dateien sind vorgemerkt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es gibt zwei Branches.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Pfeil nach oben = ausstehende Pushes, Pfeil nach unten = noch nicht geholte Commits vom Server.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Zuordnungen von IDE-Aktion zu Git-Befehl stimmen?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>VS Code „+“ bei einer Datei &rarr; <code>git add</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>IntelliJ „Update Project“ &rarr; <code>git pull</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>VS Code „Discard Changes“ &rarr; <code>git revert</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>IntelliJ <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>K</kbd> &rarr; <code>git push</code></span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> „Discard Changes“ verwirft Änderungen im Arbeitsverzeichnis und entspricht <code>git restore datei</code>, nicht <code>git revert</code> (das erzeugt einen Umkehr-Commit).</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Warum zeigt <code>git log</code> im Terminal die Commits, die du in der IDE erstellt hast?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil die IDE die Commits nachträglich ins Terminal kopiert</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Weil die IDE intern dasselbe Git und dasselbe Repository (<code>.git</code>) verwendet</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil beide über GitHub synchronisiert werden</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Das tut es nicht &ndash; IDE-Commits sind nur in der IDE sichtbar.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Die IDE ist nur eine Oberfläche für das installierte Git. Alle Commits liegen im selben Ordner <code>.git</code>.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="1.3-arbeitsalltag.html">&larr; Lektion 1.3: Der Arbeitsalltag mit Git</a>
+      <span class="nav-center-info">Lektion 1.4</span>
+      <a class="nav-btn primary" href="2.1-branches-merge.html">Lektion 2.1: Branches &amp; Merge &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

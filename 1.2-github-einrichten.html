@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.2 &ndash; Git &amp; GitHub einrichten | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 1.2 &mdash; Teil 1: Git-Grundlagen &amp; Werkzeuge</p>
+      <h1>Git &amp; GitHub einrichten</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-git">Einrichtung</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Grundlagen</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Git installieren und die Installation im Terminal überprüfen</li>
+          <li>In der Konsole Verzeichnisse wechseln, anlegen, verschieben und löschen</li>
+          <li>Einen GitHub-Account sicher einrichten (Benutzername, 2FA, private E-Mail-Adresse)</li>
+          <li>Name, E-Mail und sinnvolle Standardwerte mit <code>git config</code> festlegen</li>
+          <li>HTTPS- und SSH-Authentifizierung gegenüber GitHub unterscheiden und eine davon einrichten</li>
+          <li>Ein Repository auf GitHub anlegen und lokal klonen</li>
+          <li>Den ersten Commit erstellen, pushen und Änderungen mit <code>pull</code> holen</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Git installieren</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>System</th><th>Installation</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Windows</strong></td><td><strong>Git for Windows</strong> von <a href="https://git-scm.com">git-scm.com</a> herunterladen und installieren. Enthält Git, die <strong>Git Bash</strong> (ein Terminal mit Linux-Befehlen) und den <strong>Git Credential Manager</strong> für die Anmeldung bei GitHub.</td></tr>
+              <tr><td><strong>macOS</strong></td><td>Im Terminal <code>xcode-select --install</code> ausführen (installiert die Apple-Entwicklerwerkzeuge inkl. Git) oder mit Homebrew: <code>brew install git</code>.</td></tr>
+              <tr><td><strong>Linux</strong></td><td>Über den Paketmanager, z.&nbsp;B. <code>sudo apt install git</code> (Debian/Ubuntu) oder <code>sudo dnf install git</code> (Fedora).</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/git-scm-download.png" alt="Downloadseite auf git-scm.com: Reiter Windows, „Click here to download“ lädt den Installer von Git for Windows" loading="lazy" style="max-width:900px"></div>
+  <figcaption>Downloadseite auf git-scm.com: Reiter Windows, „Click here to download“ lädt den Installer von Git for Windows</figcaption>
+</figure>
+        <p>Im Windows-Installer kannst du fast alle Voreinstellungen übernehmen. Zwei Seiten lohnen einen Blick:</p>
+        <ul>
+          <li><strong>Choosing the default editor:</strong> „Use Visual Studio Code as Git's default editor“ wählen, falls VS Code installiert ist (statt des schwer bedienbaren Editors Vim).</li>
+          <li><strong>Adjusting the name of the initial branch:</strong> „Override the default branch name“ mit <strong>main</strong>.</li>
+        </ul>
+        <p>Danach ein <strong>neues</strong> Terminal öffnen (Windows: Git Bash oder PowerShell) und prüfen:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git --version
+# git version 2.56.1   (die genaue Nummer ist egal, ab 2.28 passt alles)</code></pre>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>2 — Die Konsole in fünf Minuten</h2>
+        <p>
+          Git bedienst du in der <strong>Konsole</strong> (auch <em>Terminal</em> oder <em>Shell</em>): Du tippst
+          einen Befehl und bestätigst mit <kbd>Enter</kbd>. Unter Windows verwendest du am besten die
+          <strong>Git Bash</strong> (im Startmenü), weil sie dieselben Befehle versteht wie macOS und Linux.
+          Für diesen Kurs brauchst du nur eine Handvoll davon:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><code>pwd</code></td><td><strong>Wo bin ich?</strong> Zeigt den aktuellen Ordner (print working directory).</td></tr>
+              <tr><td><code>ls</code>, <code>ls -a</code></td><td>Inhalt des aktuellen Ordners anzeigen; <code>-a</code> zeigt auch versteckte Einträge wie <code>.git</code>.</td></tr>
+              <tr><td><code>cd dev</code></td><td>In den Unterordner <code>dev</code> <strong>wechseln</strong>.</td></tr>
+              <tr><td><code>cd ..</code></td><td>Eine Ebene nach oben wechseln.</td></tr>
+              <tr><td><code>cd ~</code> bzw. <code>cd</code></td><td>In deinen Benutzerordner wechseln (z.&nbsp;B. <code>C:\Users\max</code> bzw. <code>/home/max</code>).</td></tr>
+              <tr><td><code>mkdir notizen</code></td><td>Ordner <code>notizen</code> <strong>anlegen</strong>; <code>mkdir -p a/b/c</code> legt auch fehlende Zwischenordner an.</td></tr>
+              <tr><td><code>mv alt.txt neu.txt</code></td><td>Datei oder Ordner <strong>umbenennen</strong>.</td></tr>
+              <tr><td><code>mv bild.png img/</code></td><td>Datei oder Ordner in einen anderen Ordner <strong>verschieben</strong>.</td></tr>
+              <tr><td><code>cp datei.txt kopie.txt</code></td><td>Datei kopieren; <code>cp -r ordner kopie</code> kopiert einen Ordner samt Inhalt.</td></tr>
+              <tr><td><code>rm datei.txt</code></td><td>Datei <strong>löschen</strong>.</td></tr>
+              <tr><td><code>rm -r ordner</code></td><td>Ordner samt Inhalt löschen.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Beispiel</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">pwd                     # /c/Users/max  (Git Bash schreibt Windows-Pfade so)
+mkdir dev               # Ordner für alle Projekte anlegen
+cd dev
+mkdir test
+ls                      # test
+mv test spielwiese      # umbenennen
+rm -r spielwiese        # wieder löschen
+cd ..                   # zurück in den Benutzerordner</code></pre>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">rm löscht endgültig</div>
+    <p>Was du mit <code>rm</code> löschst, landet <strong>nicht</strong> im Papierkorb. Prüfe vorher mit <code>pwd</code> und <code>ls</code>,
+          wo du bist und was du löschst.</p>
+  </div>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Weniger tippen</div>
+    <p><kbd>Tab</kbd> vervollständigt Datei- und Ordnernamen (<code>cd st</code> + <kbd>Tab</kbd> → <code>cd steckbrief/</code>). Mit <kbd>↑</kbd> holst du frühere Befehle zurück. Namen mit Leerzeichen setzt du in Anführungszeichen (<code>cd "Meine Projekte"</code>) &mdash; besser: Projektordner gleich ohne Leerzeichen und Umlaute benennen.</p>
+  </div>
+</div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">PowerShell</div>
+    <p>Auch die Windows-PowerShell kennt <code>pwd</code>, <code>ls</code>, <code>cd</code>, <code>mkdir</code>, <code>mv</code>, <code>cp</code> und <code>rm -r</code>. Unterschiede: versteckte Dateien zeigt <code>ls -Force</code>, und <code>mkdir</code> legt Zwischenordner automatisch an (ohne <code>-p</code>). Die alte Eingabeaufforderung <code>cmd</code> verwendet andere Befehle (<code>dir</code>, <code>md</code>, <code>rd /s</code>) &mdash; nimm Git Bash oder PowerShell.</p>
+  </div>
+</div>
+        <p>Git-Befehle wirken immer auf das Repository, in dessen Ordner du dich gerade befindest &mdash; deshalb ist <code>cd</code> der Befehl, den du neben Git am häufigsten brauchst.</p>
+      </section>
+
+      <section class="section">
+        <h2>3 — Einen GitHub-Account anlegen</h2>
+        <p>Auf <a href="https://github.com/signup">github.com/signup</a> registrierst du dich mit E-Mail-Adresse, Passwort und Benutzernamen.</p>
+        <ul>
+          <li><strong>Benutzername:</strong> erscheint in allen URLs (<em>github.com/benutzername</em>) und wird später womöglich von Lehrbetrieben oder Arbeitgebern gesehen. Wähle etwas Seriöses, z.&nbsp;B. Vor- und Nachname.</li>
+          <li><strong>Zwei-Faktor-Authentifizierung (2FA):</strong> GitHub verlangt 2FA von allen, die Code beitragen. Richte sie unter <em>Settings &rarr; Password and authentication</em> mit einer Authenticator-App oder einem Passkey ein und speichere die <strong>Recovery Codes</strong> sicher ab.</li>
+          <li><strong>E-Mail privat halten:</strong> Unter <em>Settings &rarr; Emails</em> „Keep my email addresses private“ aktivieren. GitHub zeigt dir dort eine Adresse der Form <em>12345678+benutzername@users.noreply.github.com</em>, die du gleich für Git verwendest.</li>
+        </ul>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">GitHub Education</div>
+    <p>Mit einer Schul-E-Mail-Adresse kannst du unter <em>education.github.com</em> das kostenlose
+          <strong>Student Developer Pack</strong> beantragen (u.&nbsp;a. GitHub Pro und GitHub Copilot).</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>4 — Git konfigurieren</h2>
+        <p>
+          Jeder Commit speichert Namen und E-Mail-Adresse der Person, die ihn erstellt hat. Git muss diese
+          Angaben daher kennen, bevor du den ersten Commit machst. Mit <code>git config --global</code> legst du
+          Einstellungen für <strong>alle</strong> Repositories deines Benutzerkontos fest; sie landen in
+          der Datei <code>~/.gitconfig</code>.
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – einmalig pro Rechner</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git config --global user.name "Max Muster"
+git config --global user.email "12345678+maxmuster@users.noreply.github.com"
+git config --global init.defaultBranch main
+git config --global pull.rebase false
+git config --global core.editor "code --wait"</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Einstellung</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><code>user.name</code></td><td>Name, der in deinen Commits steht</td></tr>
+              <tr><td><code>user.email</code></td><td>E-Mail in deinen Commits. Ist sie bei GitHub hinterlegt (auch die noreply-Adresse), verknüpft GitHub die Commits mit deinem Profil.</td></tr>
+              <tr><td><code>init.defaultBranch main</code></td><td>Neue Repositories beginnen mit der Hauptlinie <code>main</code> statt <code>master</code>.</td></tr>
+              <tr><td><code>pull.rebase false</code></td><td>Legt fest, was <code>git pull</code> tut, wenn sowohl du als auch jemand anderer neue Commits erstellt haben: Git führt beide Stände mit einem zusätzlichen Zusammenführungs-Commit zusammen. Ohne Einstellung bricht <code>git pull</code> in dieser Situation mit einer Fehlermeldung ab.</td></tr>
+              <tr><td><code>core.editor "code --wait"</code></td><td>Öffnet VS Code, wenn Git einen Text von dir braucht (z.&nbsp;B. eine Commit-Message). <code>--wait</code> lässt Git warten, bis du den Tab schließt.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="figure">
+  <div class="figure-img dark-bg"><img src="assets/img/vscode-commit-editor.png" alt="Mit core.editor &quot;code --wait&quot; öffnet „git commit“ ohne -m die Datei COMMIT_EDITMSG in VS Code: Message in Zeile 1 schreiben, speichern, Tab schließen" loading="lazy" style="max-width:900px"></div>
+  <figcaption>Mit core.editor &quot;code --wait&quot; öffnet „git commit“ ohne -m die Datei COMMIT_EDITMSG in VS Code: Message in Zeile 1 schreiben, speichern, Tab schließen</figcaption>
+</figure>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Einstellungen prüfen</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git config --global --list
+git config user.email          # einen einzelnen Wert abfragen</code></pre>
+</div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Drei Ebenen</div>
+    <p><code>--system</code> gilt für alle Benutzer des Rechners, <code>--global</code> für deinen Benutzer, <code>--local</code> (Standard ohne Option) nur für das aktuelle Repository (Datei <code>.git/config</code>). Die spezifischere Ebene gewinnt &mdash; so kannst du z.&nbsp;B. in einem Firmenprojekt eine andere E-Mail-Adresse verwenden.</p>
+  </div>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Zeilenenden unter Windows</div>
+    <p>Windows beendet Textzeilen mit zwei Zeichen (CR LF), Linux und macOS mit einem (LF). Git for Windows setzt standardmäßig <code>core.autocrlf=true</code>: Beim Commit werden Zeilenenden zu LF, beim Auschecken wieder zu CRLF. Lass diese Einstellung so, dann gibt es im gemischten Team keine Probleme.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>5 — Bei GitHub anmelden: HTTPS oder SSH</h2>
+        <p>
+          Lesen darf jeder ein öffentliches Repository, für <code>push</code> (und für private Repositories) musst
+          du dich gegenüber GitHub ausweisen. Dein <strong>GitHub-Passwort funktioniert dafür nicht</strong>
+          &mdash; GitHub hat die Passwort-Anmeldung für Git 2021 abgeschaltet. Es gibt zwei Wege:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>HTTPS</th><th>SSH</th></tr></thead>
+            <tbody>
+              <tr><td><strong>URL</strong></td><td><code>https://github.com/maxmuster/steckbrief.git</code></td><td><code>git@github.com:maxmuster/steckbrief.git</code></td></tr>
+              <tr><td><strong>Anmeldung</strong></td><td>Beim ersten Push öffnet der Git Credential Manager den Browser zur GitHub-Anmeldung; danach ist der Zugang gespeichert. Alternativ ein <em>Personal Access Token</em> statt Passwort.</td><td>Ein Schlüsselpaar: Der private Schlüssel bleibt am Rechner, den öffentlichen hinterlegst du bei GitHub.</td></tr>
+              <tr><td><strong>Einrichtung</strong></td><td>unter Windows/macOS meist automatisch</td><td>einmalig ein paar Befehle</td></tr>
+              <tr><td><strong>Empfehlung</strong></td><td>für den Einstieg und Schulrechner</td><td>für den eigenen Rechner, Linux, fortgeschrittene Nutzung</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Variante A: HTTPS mit Credential Manager</h3>
+        <p>
+          Unter Windows ist nichts weiter zu tun: Beim ersten <code>git push</code> erscheint ein Anmeldefenster
+          („Sign in with your browser“). Unter macOS und Linux geht es am einfachsten mit der
+          <strong>GitHub CLI</strong> (<code>gh</code>, Installation siehe <em>cli.github.com</em>), die Git für dich
+          einrichtet:
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">gh auth login
+# ? Where do you use GitHub?            GitHub.com
+# ? What is your preferred protocol?    HTTPS
+# ? Authenticate Git with your GitHub credentials? Yes
+# ? How would you like to authenticate?  Login with a web browser</code></pre>
+</div>
+        <h3>Variante B: SSH-Schlüssel</h3>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash"># 1. Schlüsselpaar erzeugen (Enter für den Standardpfad, Passphrase empfohlen)
+ssh-keygen -t ed25519 -C "max@laptop"
+
+# 2. Öffentlichen Schlüssel anzeigen und kopieren
+cat ~/.ssh/id_ed25519.pub
+
+# 3. Auf GitHub: Settings → SSH and GPG keys → New SSH key → einfügen
+
+# 4. Verbindung testen
+ssh -T git@github.com
+# Hi maxmuster! You've successfully authenticated, but GitHub does not provide shell access.</code></pre>
+</div>
+        <div class="callout callout-error">
+  <div class="callout-icon">&#10007;</div>
+  <div class="callout-body">
+    <div class="callout-title">Der private Schlüssel bleibt geheim</div>
+    <p>Bei GitHub hinterlegst du nur die Datei mit der Endung <strong>.pub</strong>. Die Datei
+          <code>id_ed25519</code> ohne Endung ist dein privater Schlüssel &mdash; wer sie hat, kann in deinem Namen pushen.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>6 — Ein Repository auf GitHub anlegen</h2>
+        <p>Oben rechts auf GitHub &rarr; <strong>+</strong> &rarr; <strong>New repository</strong>:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Feld</th><th>Empfehlung</th></tr></thead>
+            <tbody>
+              <tr><td>Owner / Repository name</td><td>dein Account, Name in Kleinbuchstaben mit Bindestrichen, z.&nbsp;B. <code>steckbrief</code></td></tr>
+              <tr><td>Description</td><td>ein Satz, worum es geht</td></tr>
+              <tr><td>Public / Private</td><td>Public: jeder kann lesen (nicht schreiben!). Private: nur du und eingeladene Personen.</td></tr>
+              <tr><td>Add README</td><td>aktivieren &mdash; dann ist das Repository nicht leer und kann sofort geklont werden. Die Datei <code>README.md</code> wird auf der Startseite des Repositorys angezeigt.</td></tr>
+              <tr><td>.gitignore / License</td><td>vorerst „None“ (Thema in Lektion 1.3)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Nach <strong>Create repository</strong> findest du über den grünen Button <strong>Code</strong>
+          die URL zum Klonen &mdash; je nach gewählter Anmeldung unter dem Reiter <em>HTTPS</em> oder <em>SSH</em>.
+        </p>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/github-repository.png" alt="Startseite eines Repositorys auf GitHub (Beispiel octocat/Spoon-Knife): Branch-Auswahl, Dateiliste mit letztem Commit je Datei, Anzahl der Commits und der grüne Button Code mit der URL zum Klonen" loading="lazy" style="max-width:900px"></div>
+  <figcaption>Startseite eines Repositorys auf GitHub (Beispiel octocat/Spoon-Knife): Branch-Auswahl, Dateiliste mit letztem Commit je Datei, Anzahl der Commits und der grüne Button Code mit der URL zum Klonen</figcaption>
+</figure>
+      </section>
+
+      <section class="section">
+        <h2>7 — Klonen: das Repository auf den Rechner holen</h2>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">cd ~/dev                      # Ordner für deine Projekte
+git clone https://github.com/maxmuster/steckbrief.git
+cd steckbrief
+ls -a
+# .  ..  .git  README.md</code></pre>
+</div>
+        <p>
+          <code>git clone</code> legt einen Ordner mit dem Namen des Repositorys an, lädt die gesamte Historie
+          in <code>.git</code> herunter und stellt die Dateien des neuesten Commits ins Arbeitsverzeichnis. Außerdem
+          merkt sich Git die Herkunft als Remote mit dem Namen <strong>origin</strong>:
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git remote -v
+# origin  https://github.com/maxmuster/steckbrief.git (fetch)
+# origin  https://github.com/maxmuster/steckbrief.git (push)
+
+git status
+# On branch main
+# Your branch is up to date with 'origin/main'.
+#
+# nothing to commit, working tree clean</code></pre>
+</div>
+        <p>
+          <code>git status</code> ist der wichtigste Befehl überhaupt: Er sagt dir, wo du stehst. <code>origin/main</code>
+          ist Gits Erinnerung daran, wie <code>main</code> auf dem Server beim letzten Kontakt aussah. „up to date“
+          heißt: Lokal und am Server ist (nach Gits Wissen) derselbe Stand.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>8 — Der erste Commit und der erste Push</h2>
+        <p>Kopiere eine Datei in den Ordner und frag Git nach dem Status:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git status
+# On branch main
+# Your branch is up to date with 'origin/main'.
+#
+# Untracked files:
+#   (use "git add &lt;file&gt;..." to include in what will be committed)
+#         index.html</code></pre>
+</div>
+        <p><strong>Untracked</strong> heißt: Die Datei liegt im Ordner, Git verfolgt sie aber noch nicht. Mit <code>git add</code> merkst du sie für den nächsten Commit vor (Staging Area), mit <code>git commit</code> speicherst du den Schnappschuss:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git add index.html
+git status
+# Changes to be committed:
+#   (use "git restore --staged &lt;file&gt;..." to unstage)
+#         new file:   index.html
+
+git commit -m "Steckbrief-Seite angelegt"
+# [main b203833] Steckbrief-Seite angelegt
+#  1 file changed, 11 insertions(+)
+#  create mode 100644 index.html</code></pre>
+</div>
+        <p><code>-m</code> übergibt die Commit-Message direkt. Ohne <code>-m</code> öffnet Git den eingestellten Editor. Jetzt ist der Commit lokal gespeichert &mdash; GitHub weiß davon noch nichts. Das ändert <code>git push</code>:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git push
+# Enumerating objects: 4, done.
+# ...
+# To https://github.com/maxmuster/steckbrief.git
+#    f437d39..b203833  main -&gt; main</code></pre>
+</div>
+        <p>Die letzte Zeile bedeutet: <code>main</code> am Server wurde von Commit <code>f437d39</code> auf <code>b203833</code> weitergeschoben. Lade die Repository-Seite auf GitHub neu &mdash; <code>index.html</code> ist da.</p>
+        <h3>Änderungen holen mit pull</h3>
+        <p>Ändert jemand anderer das Repository (oder du selbst über die GitHub-Weboberfläche oder auf einem zweiten Rechner), holst du die neuen Commits mit <code>git pull</code>:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git pull
+# From https://github.com/maxmuster/steckbrief
+#    b203833..4c1e2f7  main       -&gt; origin/main
+# Updating b203833..4c1e2f7
+# Fast-forward
+#  README.md | 2 ++
+#  1 file changed, 2 insertions(+)</code></pre>
+</div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Bestehenden Ordner statt klonen</div>
+    <p>Hast du schon einen Projektordner ohne Git, kannst du ihn mit <code>git init</code> zu einem Repository machen und anschließend mit einem <strong>leeren</strong> GitHub-Repository (ohne README) verbinden:</p>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/maxmuster/projekt.git
+git push -u origin main</code></pre>
+</div>
+          <p><code>git add .</code> merkt alle Dateien im aktuellen Ordner vor. <code>-u</code> (upstream) verknüpft das lokale <code>main</code> mit <code>origin/main</code>; danach genügen <code>git push</code> und <code>git pull</code> ohne weitere Angaben. Beim Klonen ist diese Verknüpfung automatisch vorhanden.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 1.2</span>
+    <h3>Das Steckbrief-Repository anlegen und den ersten Commit pushen</h3>
+  </div>
+<ol>
+            <li>Lege auf GitHub ein öffentliches Repository <code>steckbrief</code> <strong>mit README</strong> an.</li>
+            <li>Klone es in deinen Projektordner (nicht in <code>steckbrief-entwurf</code>!).</li>
+            <li>Kopiere <code>index.html</code> aus Lektion 1.1 in den geklonten Ordner.</li>
+            <li>Committe und pushe die Datei:</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git clone https://github.com/&lt;dein-name&gt;/steckbrief.git
+cd steckbrief
+cp ../steckbrief-entwurf/index.html .
+git status
+git add index.html
+git commit -m "Steckbrief-Seite angelegt"
+git push</code></pre>
+</div>
+          <ol start="5">
+            <li>Bearbeite auf GitHub die Datei <code>README.md</code> (Stift-Symbol), schreibe einen Satz über das Projekt und klicke <strong>Commit changes</strong>.</li>
+            <li>Hole die Änderung mit <code>git pull</code> auf deinen Rechner und kontrolliere den Inhalt von <code>README.md</code>.</li>
+          </ol>
+          <p><strong>Ergebnis:</strong> Dein Repository auf GitHub enthält <code>README.md</code> und <code>index.html</code>, und dein lokaler Stand ist identisch.</p>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Commit ohne Name und E-Mail</div>
+  <p>Der erste Commit bricht ab mit <em>Author identity unknown &mdash; Please tell me who you are.</em></p>
+          <p class="fehler-fix">Einmalig <code>git config --global user.name "…"</code> und <code>git config --global user.email "…"</code> ausführen, dann den Commit wiederholen.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: GitHub-Passwort beim Push eingeben</div>
+  <p>Beim Push fragt das Terminal nach Benutzername und Passwort; die Eingabe des GitHub-Passworts endet mit <em>Support for password authentication was removed</em>.</p>
+          <p class="fehler-fix">Den Credential Manager bzw. <code>gh auth login</code> verwenden, ein Personal Access Token als Passwort eingeben oder auf SSH umsteigen (Abschnitt 5).</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Git-Befehl im falschen Ordner</div>
+  <p><code>git status</code> meldet <em>fatal: not a git repository (or any of the parent directories): .git</em> &mdash; nach dem Klonen wurde nicht in den neuen Ordner gewechselt.</p>
+          <p class="fehler-fix">Mit <code>pwd</code> prüfen, wo du bist, und mit <code>cd steckbrief</code> in den Repository-Ordner wechseln.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Einrichtung dokumentieren</span>
+  </div>
+  <p>Führe <code>git --version</code> und <code>git config --global --list</code> aus. Notiere, welche Werte gesetzt sind, und erkläre jeden in einem Satz. Prüfe auf deinem GitHub-Profil, ob dein Commit aus dem Projektschritt mit deinem Avatar verknüpft ist &mdash; wenn nicht: Welche Einstellung stimmt nicht?</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Zweites Repository</span>
+  </div>
+  <p>Lege lokal einen neuen Ordner <code>notizen</code> mit einer Datei <code>git.md</code> an, in der du die Befehle dieser Lektion mit einer kurzen Erklärung sammelst. Mache daraus mit <code>git init</code> ein Repository, lege auf GitHub ein <strong>leeres</strong> Repository an und verbinde beide (Callout am Ende von Abschnitt 8).</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Zwei Klone, ein Repository</span>
+  </div>
+  <p>Klone dein <code>steckbrief</code>-Repository ein zweites Mal in einen Ordner <code>steckbrief-2</code> (<code>git clone &lt;url&gt; steckbrief-2</code>). Ändere in <code>steckbrief-2</code> die Überschrift, committe und pushe. Wechsle in den ersten Klon, führe zuerst <code>git status</code>, dann <code>git pull</code> und wieder <code>git status</code> aus. Erkläre, warum der erste <code>git status</code> noch „up to date“ meldet.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">SSH einrichten</span>
+  </div>
+  <p>Richte einen SSH-Schlüssel ein (Abschnitt 5, Variante B) und stelle dein Repository mit <code>git remote set-url origin git@github.com:&lt;name&gt;/steckbrief.git</code> auf SSH um. Prüfe mit <code>git remote -v</code> und einem Push.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Warum muss <code>user.email</code> vor dem ersten Commit gesetzt sein?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil GitHub sonst keine E-Mails schicken kann</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Weil jeder Commit Name und E-Mail des Autors speichert</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil die E-Mail das Passwort für den Push ersetzt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil Git sonst nicht installiert werden kann</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Autor-Name und -E-Mail sind fester Bestandteil jedes Commits. Mit der Anmeldung bei GitHub hat die E-Mail nichts zu tun.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Womit kannst du dich beim Push zu GitHub anmelden?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span>Über den Git Credential Manager mit Browser-Anmeldung</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-2"> <span>Mit dem normalen GitHub-Passwort im Terminal</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span>Mit einem SSH-Schlüssel, dessen öffentlicher Teil bei GitHub hinterlegt ist</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span>Mit einem Personal Access Token</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Die Passwort-Anmeldung für Git-Operationen ist bei GitHub seit 2021 abgeschaltet. Credential Manager, Token und SSH funktionieren.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was macht <code>git clone &lt;url&gt;</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es lädt nur die neuesten Dateien herunter, ohne Historie.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Es legt einen Ordner an, lädt die gesamte Historie herunter und richtet das Remote „origin“ ein.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es erstellt ein neues, leeres Repository auf GitHub.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es kopiert das lokale Repository auf GitHub.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Ein Klon enthält das komplette Repository samt Historie; die Quelle wird als <code>origin</code> gespeichert.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> <code>git status</code> zeigt eine Datei unter <em>Untracked files</em>. Was bedeutet das?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Die Datei wurde bereits gepusht.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Die Datei ist für den nächsten Commit vorgemerkt.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Die Datei liegt im Ordner, wird aber von Git noch nicht verfolgt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Die Datei wurde auf GitHub gelöscht.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Untracked = Git kennt die Datei noch nicht. Erst <code>git add</code> nimmt sie in die Staging Area auf.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Du hast committet. Was gilt <strong>vor</strong> dem <code>git push</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der Commit ist bereits auf GitHub sichtbar.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Der Commit existiert nur im lokalen Repository.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der Commit liegt noch in der Staging Area.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der Commit ist ungültig, bis er gepusht wurde.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Commits werden lokal gespeichert und sind vollwertig. Erst <code>git push</code> überträgt sie zum Remote.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="1.1-sinn-und-zweck.html">&larr; Lektion 1.1: Sinn und Zweck von Git</a>
+      <span class="nav-center-info">Lektion 1.2</span>
+      <a class="nav-btn primary" href="1.3-arbeitsalltag.html">Lektion 1.3: Der Arbeitsalltag mit Git &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

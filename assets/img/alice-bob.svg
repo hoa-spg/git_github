@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" viewBox="0 0 720 400" width="720" height="400">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333"/></marker></defs>
+  <rect width="720" height="400" fill="#fff"/>
+  <rect x="50" y="15" width="140" height="34" rx="6" fill="#fff4ef" stroke="#f1502f"/><text x="120" y="37" text-anchor="middle" font-weight="600">Alice</text>
+  <rect x="290" y="15" width="140" height="34" rx="6" fill="#ede9fe" stroke="#7c3aed"/><text x="360" y="37" text-anchor="middle" font-weight="600">GitHub (origin)</text>
+  <rect x="530" y="15" width="140" height="34" rx="6" fill="#e8f4fd" stroke="#2b7bb9"/><text x="600" y="37" text-anchor="middle" font-weight="600">Bob</text>
+  <line x1="120" y1="49" x2="120" y2="390" stroke="#bbb" stroke-dasharray="4 4"/>
+  <line x1="360" y1="49" x2="360" y2="390" stroke="#bbb" stroke-dasharray="4 4"/>
+  <line x1="600" y1="49" x2="600" y2="390" stroke="#bbb" stroke-dasharray="4 4"/>
+  <g font-size="12">
+    <rect x="20" y="70" width="200" height="40" rx="5" fill="#fff"  stroke="#f1502f"/>
+    <text x="120" y="86" text-anchor="middle">① Branch, Titel ändern,</text><text x="120" y="102" text-anchor="middle">commit</text>
+    <rect x="500" y="70" width="200" height="40" rx="5" fill="#fff" stroke="#2b7bb9"/>
+    <text x="600" y="86" text-anchor="middle">① Branch, Titel ändern,</text><text x="600" y="102" text-anchor="middle">commit (gleichzeitig)</text>
+    <line x1="120" y1="140" x2="357" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="240" y="132" text-anchor="middle">② in main mergen + push</text>
+    <text x="370" y="160" fill="#555">main: „Die Schulband der HTL“</text>
+    <line x1="360" y1="200" x2="597" y2="200" stroke="#333" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="480" y="192" text-anchor="middle">③ git pull (auf main)</text>
+    <rect x="490" y="225" width="220" height="44" rx="5" fill="#fdecea" stroke="#d93025"/>
+    <text x="600" y="243" text-anchor="middle" font-weight="600" fill="#b3261e">④ git merge main</text><text x="600" y="260" text-anchor="middle" fill="#b3261e">→ CONFLICT in index.html</text>
+    <rect x="490" y="285" width="220" height="40" rx="5" fill="#e6f4ea" stroke="#1e8e3e"/>
+    <text x="600" y="301" text-anchor="middle">⑤ Konflikt auflösen,</text><text x="600" y="317" text-anchor="middle">add + commit</text>
+    <line x1="600" y1="360" x2="363" y2="360" stroke="#333" stroke-width="1.5" marker-end="url(#a)"/>
+    <text x="480" y="352" text-anchor="middle">⑥ main mergen + push</text>
+    <text x="20" y="250" fill="#555">Beide haben dieselbe Zeile</text>
+    <text x="20" y="266" fill="#555">(&lt;h1&gt;) unterschiedlich geändert.</text>
+    <text x="20" y="282" fill="#555">Git kann nicht entscheiden,</text>
+    <text x="20" y="298" fill="#555">welche Version richtig ist.</text>
+  </g>
+</svg>

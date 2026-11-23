@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="index-hero">
+      <p class="lesson-eyebrow">Kursübersicht</p>
+      <h1>Git <span>&amp; GitHub</span></h1>
+      <p class="subtitle">
+        9 Lektionen zur Versionsverwaltung mit Git &mdash; vom ersten Commit über GitHub, VS Code und
+        IntelliJ bis zu Branches, Rebase, Merge-Konflikten, Pull Requests und automatisierten
+        Workflows mit GitHub Actions. Mit durchgehendem Praxisprojekt und interaktiver
+        Wissenskontrolle am Ende jeder Lektion.
+      </p>
+      <div class="lesson-tags" style="margin-top:1.25rem">
+        <span class="tag tag-git">Git</span>
+        <span class="tag tag-gh">GitHub</span>
+        <span class="tag tag-gh">GitHub Actions</span>
+        <span class="tag tag-time">ca. 13 Stunden</span>
+        <span class="tag tag-time">Web- und Mobile Computing</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <div class="section">
+        <h2 class="git-header" style="border-bottom:2px solid rgba(241,80,47,0.4);padding-bottom:.5rem">
+          Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge
+        </h2>
+        <div class="course-grid">
+          <a class="lesson-card git-card" href="1.1-sinn-und-zweck.html">
+            <span class="lesson-card-num">1.1</span>
+            <div class="lesson-card-content"><h4>Sinn und Zweck von Git</h4><p>Versionsverwaltung, Repository, Commit, die drei Bereiche, clone &middot; commit &middot; push &middot; pull im Überblick</p></div>
+          </a>
+          <a class="lesson-card git-card" href="1.2-github-einrichten.html">
+            <span class="lesson-card-num">1.2</span>
+            <div class="lesson-card-content"><h4>Git &amp; GitHub einrichten</h4><p>Installation, GitHub-Account, git config, HTTPS vs. SSH, Repository anlegen, klonen, erster Push</p></div>
+          </a>
+          <a class="lesson-card git-card" href="1.3-arbeitsalltag.html">
+            <span class="lesson-card-num">1.3</span>
+            <div class="lesson-card-content"><h4>Der Arbeitsalltag mit Git</h4><p>status, diff, add, commit, log, .gitignore, gute Commit-Messages, Änderungen rückgängig machen</p></div>
+          </a>
+          <a class="lesson-card git-card" href="1.4-vscode-intellij.html">
+            <span class="lesson-card-num">1.4</span>
+            <div class="lesson-card-content"><h4>Git in VS Code und IntelliJ</h4><p>Klonen, Stagen, Committen, Push/Pull, Branches und Konflikte in der IDE, Tastenkürzel</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2 class="gh-header" style="border-bottom:2px solid rgba(167,139,250,0.4);padding-bottom:.5rem">
+          Teil 2 &mdash; Branches &amp; Zusammenarbeit
+        </h2>
+        <div class="course-grid">
+          <a class="lesson-card gh-card" href="2.1-branches-merge.html">
+            <span class="lesson-card-num">2.1</span>
+            <div class="lesson-card-content"><h4>Branches &amp; Merge</h4><p>Branch, HEAD, switch, Fast-Forward und Three-Way-Merge, Remote-Branches, fetch vs. pull</p></div>
+          </a>
+          <a class="lesson-card gh-card" href="2.2-rebase-feature-branches.html">
+            <span class="lesson-card-num">2.2</span>
+            <div class="lesson-card-content"><h4>Rebase, Feature-Branches &amp; Pull Requests</h4><p>Rebase vs. Merge, goldene Regel, Feature-Branch-Workflow, Idee des Pull Requests</p></div>
+          </a>
+          <a class="lesson-card gh-card" href="2.3-merge-konflikt-demo.html">
+            <span class="lesson-card-num">2.3</span>
+            <div class="lesson-card-content"><h4>Demo: Merge-Konflikt mit Alice &amp; Bob</h4><p>Schritt für Schritt lokal nachgespielt: Konflikt entsteht, Konfliktmarker lesen, auflösen, abgewiesener Push, Rebase-Konflikt</p></div>
+          </a>
+          <a class="lesson-card gh-card" href="2.4-pull-requests.html">
+            <span class="lesson-card-num">2.4</span>
+            <div class="lesson-card-content"><h4>Pull Requests auf GitHub</h4><p>Collaborators, PR erstellen, Code Review, Merge-Varianten, Branch-Schutz, Issues, Forks, GitHub CLI</p></div>
+          </a>
+          <a class="lesson-card gh-card" href="2.5-github-actions.html">
+            <span class="lesson-card-num">2.5</span>
+            <div class="lesson-card-content"><h4>GitHub Actions</h4><p>Workflows, Events, Jobs und Steps, YAML, CI mit Node.js, Status Checks, Secrets, Deployment auf GitHub Pages</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Das Praxisprojekt: dein Steckbrief-Repository</h2>
+        <p>
+          Ab Lektion 1.2 arbeitest du an einem eigenen GitHub-Repository <strong><code>steckbrief</code></strong>: eine
+          kleine HTML-Seite über dich (wie im <a href="../html_css/index.html">HTML-&amp;-CSS-Kurs</a>).
+          Lektion für Lektion kommen neue Git-Techniken dazu &mdash; bis die Seite am Ende nach jedem Push
+          automatisch geprüft und auf GitHub Pages veröffentlicht wird.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Lektion</th><th>Projektschritt</th></tr></thead>
+            <tbody>
+              <tr><td>1.1</td><td>Ordner und erste Datei vorbereiten (noch ohne Git)</td></tr>
+              <tr><td>1.2</td><td>Repository auf GitHub anlegen, klonen, ersten Commit pushen</td></tr>
+              <tr><td>1.3</td><td><code>.gitignore</code>, mehrere saubere Commits, Historie ansehen</td></tr>
+              <tr><td>1.4</td><td>Änderung in VS Code oder IntelliJ committen und pushen</td></tr>
+              <tr><td>2.1</td><td>Hobby-Abschnitt auf eigenem Branch entwickeln und mergen</td></tr>
+              <tr><td>2.2</td><td>Feature-Branch mit Rebase aktualisieren und pushen</td></tr>
+              <tr><td>2.3</td><td>Einen Merge-Konflikt selbst erzeugen und auflösen</td></tr>
+              <tr><td>2.4</td><td>Pull Request mit Partner-Review, Branch-Schutz für main</td></tr>
+              <tr><td>2.5</td><td>HTML-Prüfung und Deployment auf GitHub Pages mit GitHub Actions</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Wo liegt der Projektstand?</div>
+    <p>Anders als in den anderen Kursen gibt es hier keinen Ordner <code>beispiele/</code>: Der Stand deines
+          Projekts ist die Commit-Historie in deinem eigenen GitHub-Repository &mdash; genau darum geht es
+          in diesem Kurs.</p>
+  </div>
+</div>
+      </div>
+
+      <div class="section">
+        <h2>Voraussetzungen &amp; Werkzeuge</h2>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Empfohlenes Vorwissen</div>
+    <p>Grundkenntnisse im Umgang mit dem Terminal (Ordner wechseln, Dateien auflisten) und etwas HTML.
+          Für Lektion 2.5 hilft der <a href="../javascript/index.html">JavaScript-Kurs</a> (npm), ist aber
+          nicht zwingend.</p>
+  </div>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Benötigte Software</div>
+    <p>Git (ab Version 2.28), ein kostenloser GitHub-Account, Visual Studio Code und/oder IntelliJ IDEA.
+          Alles wird in Lektion 1.2 bzw. 1.4 eingerichtet.</p>
+  </div>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Priorität</th><th>Lektionen</th><th>Niveau-Tag</th></tr></thead>
+            <tbody>
+              <tr><td>unbedingt beherrschen</td><td>1.1–1.4, 2.1, 2.3</td><td>Grundlagen</td></tr>
+              <tr><td>fortgeschritten</td><td>2.2, 2.4, 2.5</td><td>Fortgeschritten</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Kurs lokal ansehen</h2>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Lokaler Test</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">python3 -m http.server 8080
+# → http://localhost:8080/index.html</code></pre>
+</div>
+      </div>
+
+    </div><!-- /content-area -->
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
+</html>

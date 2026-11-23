@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.5 &ndash; GitHub Actions | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 2.5 &mdash; Teil 2: Branches &amp; Zusammenarbeit</p>
+      <h1>GitHub Actions</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-gh">GitHub Actions</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Fortgeschritten</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Die Begriffe Continuous Integration und Continuous Deployment erklären</li>
+          <li>Den Aufbau eines Workflows (Event, Job, Step, Runner, Action) beschreiben</li>
+          <li>YAML-Dateien lesen und korrekt einrücken</li>
+          <li>Einen CI-Workflow schreiben, der bei Push und Pull Request Tests ausführt</li>
+          <li>Fehlgeschlagene Läufe im Reiter Actions analysieren und Status Checks in Pull Requests nutzen</li>
+          <li>Secrets sicher verwenden und eine Website per Workflow auf GitHub Pages veröffentlichen</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Wozu Automatisierung?</h2>
+        <p>
+          Im Feature-Branch-Workflow prüft ein Mensch jeden Pull Request. Manche Prüfungen sind aber
+          stumpf und fehleranfällig, wenn man sie von Hand macht: Laufen alle Tests? Lässt sich das Projekt
+          bauen? Ist das HTML gültig? Solche Aufgaben erledigt eine Maschine bei <strong>jedem</strong> Push
+          zuverlässig.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Begriff</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Continuous Integration (CI)</strong></td><td>Jede Änderung wird automatisch gebaut und getestet, sobald sie gepusht wird. Fehler fallen sofort auf, nicht erst Tage später.</td></tr>
+              <tr><td><strong>Continuous Deployment (CD)</strong></td><td>Hat eine Änderung alle Prüfungen bestanden und ist in <code>main</code>, wird sie automatisch veröffentlicht (z.&nbsp;B. auf einen Webserver).</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>GitHub Actions</strong> ist das in GitHub eingebaute Werkzeug dafür. Die Konfiguration liegt als Datei im Repository &mdash; sie wird also selbst versioniert und über Pull Requests geändert.</p>
+      </section>
+
+      <section class="section">
+        <h2>2 — Die Bausteine</h2>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/actions-aufbau.svg" alt="Ein Event startet einen Workflow; der Workflow besteht aus Jobs, ein Job aus Steps." loading="lazy" style="max-width:720px"></div>
+  <figcaption>Ein Event startet einen Workflow; der Workflow besteht aus Jobs, ein Job aus Steps.</figcaption>
+</figure>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Begriff</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Workflow</strong></td><td>Eine automatisierte Abfolge, definiert in einer YAML-Datei unter <code>.github/workflows/</code>. Ein Repository kann beliebig viele Workflows haben.</td></tr>
+              <tr><td><strong>Event</strong></td><td>Das Ereignis, das den Workflow startet: Push, Pull Request, Zeitplan, Klick auf einen Button …</td></tr>
+              <tr><td><strong>Job</strong></td><td>Eine Gruppe von Schritten, die gemeinsam auf <em>einer</em> Maschine laufen. Mehrere Jobs laufen standardmäßig parallel; mit <code>needs</code> wartet ein Job auf einen anderen.</td></tr>
+              <tr><td><strong>Step</strong></td><td>Ein einzelner Schritt: entweder ein Shell-Befehl (<code>run</code>) oder eine fertige Action (<code>uses</code>). Schlägt ein Step fehl, bricht der Job ab.</td></tr>
+              <tr><td><strong>Runner</strong></td><td>Die (virtuelle) Maschine, auf der ein Job läuft, z.&nbsp;B. <code>ubuntu-latest</code>, <code>windows-latest</code>, <code>macos-latest</code>. Sie wird für jeden Job frisch erzeugt und danach gelöscht.</td></tr>
+              <tr><td><strong>Action</strong></td><td>Ein wiederverwendbarer Baustein aus dem <strong>GitHub Marketplace</strong>, z.&nbsp;B. <code>actions/checkout</code> (Repository auf den Runner klonen) oder <code>actions/setup-node</code> (Node.js installieren).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>3 — YAML in fünf Minuten</h2>
+        <p>Workflows sind in <strong>YAML</strong> geschrieben, einem Format für strukturierte Daten wie JSON, aber ohne Klammern: Die Struktur ergibt sich aus der <strong>Einrückung</strong>.</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">beispiel.yml</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml"># Kommentar
+name: Steckbrief            # Schlüssel: Wert (String, Anführungszeichen optional)
+version: 3                  # Zahl
+aktiv: true                 # Boolean
+
+autor:                      # verschachteltes Objekt: eingerückt mit 2 Leerzeichen
+  name: Max Muster
+  klasse: 3AHIF
+
+hobbys:                     # Liste: jedes Element beginnt mit "- "
+  - Klettern
+  - Gitarre
+
+sprachen: [HTML, CSS, Java] # Liste in Kurzschreibweise
+
+beschreibung: |             # mehrzeiliger Text, Zeilenumbrüche bleiben erhalten
+  Zeile eins
+  Zeile zwei</code></pre>
+</div>
+        <div class="callout callout-error">
+  <div class="callout-icon">&#10007;</div>
+  <div class="callout-body">
+    <div class="callout-title">Nur Leerzeichen, keine Tabs</div>
+    <p>YAML erlaubt zum Einrücken ausschließlich Leerzeichen. Eine falsche Einrückung ändert die
+          Bedeutung oder macht die Datei ungültig &mdash; GitHub zeigt dann im Reiter Actions einen Fehler
+          wie <em>Invalid workflow file</em>. VS Code mit der Erweiterung „GitHub Actions“ markiert solche
+          Fehler schon beim Tippen.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>4 — Der erste Workflow</h2>
+        <p>Lege im Repository die Datei <code>.github/workflows/hallo.yml</code> an (die Ordner <code>.github</code> und <code>workflows</code> musst du selbst erstellen), committe und pushe sie:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">.github/workflows/hallo.yml</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml">name: Hallo
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  begruessen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hallo sagen
+        run: echo "Hallo ${{ github.actor }}, Branch $GITHUB_REF_NAME"
+
+      - name: Was liegt auf dem Runner?
+        run: ls -la
+
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+
+      - name: Und jetzt?
+        run: ls -la</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Zeile</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><code>name: Hallo</code></td><td>Anzeigename im Reiter Actions</td></tr>
+              <tr><td><code>on:</code></td><td>Events: bei jedem Push und manuell per Button („Run workflow“)</td></tr>
+              <tr><td><code>jobs: begruessen:</code></td><td>ein Job mit der ID <code>begruessen</code></td></tr>
+              <tr><td><code>runs-on: ubuntu-latest</code></td><td>auf einem aktuellen Ubuntu-Runner ausführen</td></tr>
+              <tr><td><code>steps:</code></td><td>Liste der Schritte; <code>name</code> ist optional, aber hilfreich in den Logs</td></tr>
+              <tr><td><code>run:</code></td><td>Shell-Befehl auf dem Runner</td></tr>
+              <tr><td><code>uses: actions/checkout@v6</code></td><td>fertige Action in Version 6 verwenden</td></tr>
+              <tr><td><code>${{ github.actor }}</code></td><td>Ausdruck: wird vor dem Ausführen durch einen Wert ersetzt (hier: wer gepusht hat). <code>$GITHUB_REF_NAME</code> ist eine Umgebungsvariable des Runners.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Öffne auf GitHub den Reiter <strong>Actions</strong>: Dort erscheint der Lauf. Ein Klick auf den
+          Job zeigt die Logs jedes Steps. Du wirst sehen: Beim ersten <code>ls -la</code> ist der Ordner
+          <strong>leer</strong>. Der Runner ist eine frische Maschine &mdash; dein Code ist erst nach
+          <code>actions/checkout</code> da. Fast jeder Workflow beginnt deshalb mit diesem Step.
+        </p>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Grün, rot, gelb</div>
+    <p>Ein Step gilt als fehlgeschlagen, wenn sein Befehl mit einem Exit-Code ungleich 0 endet (z.&nbsp;B.
+          ein fehlgeschlagener Test). Dann wird der Job rot (✗), die folgenden Steps laufen nicht mehr, und
+          GitHub schickt dir eine Benachrichtigung. Grün (✓) = alles bestanden, gelb = läuft noch. Mit
+          <strong>Re-run jobs</strong> kann man einen Lauf wiederholen.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>5 — Wann läuft ein Workflow? Events</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Event</th><th>Auslöser</th></tr></thead>
+            <tbody>
+              <tr><td><code>push</code></td><td>Push auf einen Branch; mit <code>branches: [main]</code> nur für bestimmte Branches</td></tr>
+              <tr><td><code>pull_request</code></td><td>PR wird geöffnet oder neue Commits kommen hinzu</td></tr>
+              <tr><td><code>workflow_dispatch</code></td><td>manueller Start über den Button „Run workflow“</td></tr>
+              <tr><td><code>schedule</code></td><td>Zeitplan im Cron-Format, z.&nbsp;B. <code>- cron: '0 6 * * 1'</code> = jeden Montag 6:00 UTC</td></tr>
+              <tr><td><code>release</code>, <code>issues</code>, …</td><td>viele weitere GitHub-Ereignisse</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Ausschnitt: typische Event-Konfiguration für CI</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml">on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'          # reine Doku-Änderungen lösen keinen Lauf aus</code></pre>
+</div>
+        <p>Mit dieser Konfiguration läuft die Prüfung für jeden PR nach <code>main</code> und noch einmal nach dem Merge auf <code>main</code>.</p>
+      </section>
+
+      <section class="section">
+        <h2>6 — Continuous Integration für ein Node-Projekt</h2>
+        <p>Ein typisches Webprojekt mit npm (z.&nbsp;B. aus dem React-Kurs) hat in <code>package.json</code> ein Skript <code>test</code>. Der folgende Workflow installiert die Abhängigkeiten und führt die Tests aus:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">.github/workflows/ci.yml</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml">name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm test</code></pre>
+</div>
+        <ul>
+          <li><strong><code>with:</code></strong> übergibt Parameter an eine Action &mdash; hier die Node-Version und das Zwischenspeichern der npm-Downloads zwischen Läufen.</li>
+          <li><strong><code>npm ci</code></strong> installiert exakt die Versionen aus <code>package-lock.json</code> (die Datei muss committet sein). Das ist reproduzierbarer und schneller als <code>npm install</code>.</li>
+          <li>Schlägt <code>npm run build</code> oder ein Test fehl, wird der Job rot.</li>
+        </ul>
+        <h3>Mehrere Versionen gleichzeitig: Matrix</h3>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Ausschnitt</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml">jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm test</code></pre>
+</div>
+        <p>GitHub startet den Job zweimal parallel, einmal pro Wert in der Matrix.</p>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Andere Sprachen</div>
+    <p>Für Java gibt es <code>actions/setup-java</code> (z.&nbsp;B. mit <code>mvn -B verify</code>), für Python
+          <code>actions/setup-python</code>. Das Muster ist immer gleich: auschecken, Werkzeug einrichten, bauen, testen.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>7 — Status Checks im Pull Request</h2>
+        <p>
+          Läuft ein Workflow bei <code>pull_request</code>, zeigt der PR unten im Reiter <em>Conversation</em> das
+          Ergebnis an: <em>All checks have passed</em> oder <em>Some checks were not successful</em> mit Link
+          zu den Logs. Im Reiter <strong>Checks</strong> siehst du alle Läufe.
+        </p>
+        <p>
+          Zusammen mit den Branch-Regeln aus Lektion 2.4 entsteht ein Qualitätstor: Im Ruleset für <code>main</code>
+          <strong>Require status checks to pass</strong> aktivieren und unter <em>Add checks</em> den Job
+          (hier <code>test</code>) auswählen. Dann ist der Merge-Button gesperrt, solange der Check rot ist &mdash;
+          auch für den Owner.
+        </p>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Badge im README</div>
+    <p>Der Status eines Workflows lässt sich als Bild im README zeigen. Im Reiter Actions den Workflow
+          wählen &rarr; Menü <strong>…</strong> &rarr; <strong>Create status badge</strong> &mdash; GitHub
+          liefert die fertige Markdown-Zeile.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>8 — Secrets und Berechtigungen</h2>
+        <p>
+          Manche Workflows brauchen Zugangsdaten, z.&nbsp;B. ein Passwort für einen Webserver oder einen
+          API-Key. Diese gehören <strong>nie</strong> in die YAML-Datei (die ist für alle mit Leserechten
+          sichtbar), sondern unter <em>Settings &rarr; Secrets and variables &rarr; Actions &rarr; New repository
+          secret</em>:
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Ausschnitt</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml">- name: Auf den Server hochladen
+  run: ./deploy.sh
+  env:
+    DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}</code></pre>
+</div>
+        <ul>
+          <li>Secrets sind nach dem Speichern nicht mehr lesbar, auch nicht für den Owner, und erscheinen in Logs als <code>***</code>.</li>
+          <li>Workflows, die durch PRs aus <strong>Forks</strong> ausgelöst werden, bekommen keine Secrets &mdash; sonst könnte jeder sie mit einem präparierten PR auslesen.</li>
+          <li>Jeder Lauf erhält automatisch ein kurzlebiges Token <code>GITHUB_TOKEN</code> für Zugriffe auf das eigene Repository. Mit <code>permissions:</code> legst du fest, was es darf &mdash; so wenig wie möglich.</li>
+        </ul>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Fremde Actions sind fremder Code</div>
+    <p>Eine Action aus dem Marketplace läuft mit Zugriff auf deinen Code und deine Secrets. Verwende
+          bevorzugt offizielle Actions (<code>actions/…</code>) oder solche von verifizierten Herstellern, und gib immer
+          eine Version an (<code>@v6</code>), nie <code>@main</code>.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>9 — Continuous Deployment: GitHub Pages</h2>
+        <p>
+          <strong>GitHub Pages</strong> veröffentlicht statische Websites (HTML, CSS, JavaScript) kostenlos
+          unter <em>https://&lt;benutzername&gt;.github.io/&lt;repository&gt;/</em>. Mit einem Workflow
+          geschieht das automatisch nach jedem Push auf <code>main</code> &mdash; aber nur, wenn vorher alle Prüfungen
+          bestanden sind.
+        </p>
+        <p>Einmalig in den Repository-Einstellungen: <em>Settings &rarr; Pages &rarr; Build and deployment &rarr; Source:</em> <strong>GitHub Actions</strong>.</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">.github/workflows/pages.yml</span>
+    <span class="code-lang">YAML</span>
+  </div>
+  <pre><code class="language-yaml">name: Prüfen und veröffentlichen
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - name: HTML prüfen
+        run: npx --yes html-validate "*.html"
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v5</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Teil</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td>Job <code>check</code></td><td>prüft alle HTML-Dateien mit dem npm-Paket <strong>html-validate</strong>; <code>npx --yes</code> lädt es ohne Installation</td></tr>
+              <tr><td><code>needs: check</code></td><td><code>deploy</code> startet nur, wenn <code>check</code> erfolgreich war</td></tr>
+              <tr><td><code>if: github.ref == 'refs/heads/main'</code></td><td>bei Pull Requests wird nur geprüft, veröffentlicht wird nur von <code>main</code></td></tr>
+              <tr><td><code>permissions</code></td><td>das <code>GITHUB_TOKEN</code> darf auf Pages schreiben &mdash; sonst nichts</td></tr>
+              <tr><td><code>environment</code></td><td>zeigt die URL der veröffentlichten Seite im Lauf und auf der Startseite des Repositorys an</td></tr>
+              <tr><td><code>upload-pages-artifact</code> mit <code>path: .</code></td><td>verpackt den Inhalt des Repository-Ordners (bei Vite-Projekten stattdessen z.&nbsp;B. <code>dist</code> nach einem Build-Step)</td></tr>
+              <tr><td><code>deploy-pages</code></td><td>veröffentlicht das Paket auf GitHub Pages</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Versionsnummern der Actions</div>
+    <p>Die Beispiele verwenden die Hauptversionen mit Stand November 2026. Welche aktuell ist, steht auf der
+          Seite der jeweiligen Action im Marketplace bzw. auf GitHub unter <em>Releases</em>. Ältere
+          Hauptversionen funktionieren meist weiter, erzeugen aber irgendwann Warnungen im Log.</p>
+  </div>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Ohne Workflow</div>
+    <p>Für eine reine HTML-Seite ohne Prüfung geht es auch einfacher: <em>Settings &rarr; Pages &rarr; Source:
+          Deploy from a branch</em>, Branch <code>main</code>, Ordner <code>/ (root)</code>. GitHub veröffentlicht dann jeden Push
+          auf <code>main</code> direkt.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>10 — Kosten und Grenzen</h2>
+        <ul>
+          <li>Für <strong>öffentliche Repositories</strong> sind die Standard-Runner von GitHub kostenlos.</li>
+          <li>Für <strong>private Repositories</strong> enthält jeder Plan ein monatliches Freikontingent an Minuten; Windows- und macOS-Runner verbrauchen es schneller als Linux.</li>
+          <li>Ein Job darf höchstens einige Stunden laufen; geplante Workflows in Repositories ohne Aktivität werden nach einiger Zeit automatisch deaktiviert.</li>
+          <li>Die aktuellen Zahlen stehen in der GitHub-Dokumentation unter „Billing for GitHub Actions“.</li>
+        </ul>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 2.5</span>
+    <h3>Steckbrief automatisch prüfen und veröffentlichen</h3>
+  </div>
+<ol>
+            <li>Stelle unter <em>Settings &rarr; Pages</em> die Quelle auf <strong>GitHub Actions</strong>.</li>
+            <li>Lege auf einem Branch <code>feature/pages</code> die Dateien <code>.github/workflows/pages.yml</code> (aus Abschnitt 9) und <code>.htmlvalidate.json</code> an. Die Konfiguration wählt die Regeln „standard“ (Einhaltung des HTML-Standards); <code>html-validate:recommended</code> wäre strenger.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">.htmlvalidate.json</span>
+    <span class="code-lang">JSON</span>
+  </div>
+  <pre><code class="language-json">{
+  "extends": ["html-validate:standard"]
+}</code></pre>
+</div>
+          <ol start="3">
+            <li>Baue absichtlich einen Fehler ein, z.&nbsp;B. ein vergessenes <code>&lt;/ul&gt;</code> oder dieselbe <code>id</code> an zwei Elementen. Pushe und öffne einen PR: Der Check <code>check</code> wird rot. Lies im Log, welche Zeile bemängelt wird.</li>
+            <li>Behebe den Fehler mit einem weiteren Commit auf dem Branch &mdash; der Check wird grün.</li>
+            <li>Ergänze im Ruleset für <code>main</code> <strong>Require status checks to pass</strong> mit dem Check <code>check</code>.</li>
+            <li>Merge den PR. Im Reiter Actions läuft jetzt auch <code>deploy</code>; danach ist dein Steckbrief unter <em>https://&lt;name&gt;.github.io/steckbrief/</em> online.</li>
+            <li>Füge die Adresse oben rechts im Repository unter <strong>About &rarr; Website</strong> ein und ein Status-Badge in <code>README.md</code>.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main &amp;&amp; git pull
+git switch -c feature/pages
+mkdir -p .github/workflows
+# pages.yml und .htmlvalidate.json anlegen
+git add .github .htmlvalidate.json
+git commit -m "Workflow für Prüfung und GitHub Pages"
+git push -u origin feature/pages</code></pre>
+</div>
+          <p><strong>Ergebnis:</strong> Jede Änderung am Steckbrief wird im PR automatisch geprüft und nach dem Merge ohne weiteres Zutun veröffentlicht &mdash; der komplette Weg vom Commit bis zur Website.</p>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Workflow-Datei am falschen Ort</div>
+  <p>Die Datei liegt in <code>.github/workflow/ci.yml</code> oder <code>github/workflows/ci.yml</code>. Im Reiter Actions passiert nichts.</p>
+          <p class="fehler-fix">Der Pfad muss exakt <code>.github/workflows/</code> lauten (mit Punkt, Mehrzahl) und die Endung <code>.yml</code> oder <code>.yaml</code> haben.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Einrückung falsch</div>
+  <p>GitHub meldet <em>Invalid workflow file: … unexpected value 'runs-on'</em>, weil <code>runs-on</code> nicht unter dem Job, sondern auf gleicher Ebene steht.</p>
+          <p class="fehler-fix">Einrückung mit Leerzeichen prüfen: <code>jobs:</code> &rarr; Job-ID (2 Leerzeichen) &rarr; <code>runs-on</code>, <code>steps</code> (4 Leerzeichen) &rarr; Listenelemente. Einen YAML-fähigen Editor verwenden.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Checkout vergessen</div>
+  <p><code>npm ci</code> scheitert mit <em>The `npm ci` command can only install with an existing package-lock.json</em>, obwohl die Datei im Repository liegt.</p>
+          <p class="fehler-fix">Der Runner startet leer. Als ersten Step <code>uses: actions/checkout@v6</code> eintragen.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Logs lesen</span>
+  </div>
+  <p>Lege den Workflow <code>hallo.yml</code> aus Abschnitt 4 an. Starte ihn einmal per Push und einmal manuell über „Run workflow“. Vergleiche die Ausgaben von <code>github.actor</code> und <code>$GITHUB_REF_NAME</code> sowie die beiden <code>ls -la</code>. Ergänze einen Step, der mit <code>exit 1</code> absichtlich fehlschlägt, und beobachte, was mit den folgenden Steps passiert.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">CI für ein npm-Projekt</span>
+  </div>
+  <p>Nimm ein Projekt aus dem JavaScript- oder React-Kurs mit <code>package.json</code> (oder lege mit <code>npm init -y</code> ein neues an und setze das Skript <code>test</code> auf <code>node --test</code>). Schreibe einen Workflow nach Abschnitt 6, der bei jedem PR läuft. Baue einen fehlschlagenden Test ein und zeige, dass der PR einen roten Check bekommt.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Zeitgesteuerter Workflow</span>
+  </div>
+  <p>Schreibe einen Workflow, der jeden Montag um 7:00 Uhr österreichischer Zeit (Achtung: Cron läuft in UTC) und per Button startet und mit <code>date</code> und <code>git log --oneline -5</code> ausgibt, was in der letzten Woche committet wurde. Tipp: <code>actions/checkout</code> holt standardmäßig nur den letzten Commit; mit <code>with: fetch-depth: 0</code> die ganze Historie.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Matrix über Betriebssysteme</span>
+  </div>
+  <p>Erweitere deinen CI-Workflow aus Aufgabe 2 um eine Matrix über <code>os: [ubuntu-latest, windows-latest, macos-latest]</code> (<code>runs-on: ${{ matrix.os }}</code>) und zwei Node-Versionen. Wie viele Jobs entstehen? Vergleiche die Laufzeiten.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Wo muss eine Workflow-Datei liegen, damit GitHub sie ausführt?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Im Hauptordner als <code>workflow.yml</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Im Ordner <code>.github/workflows/</code> mit Endung <code>.yml</code> oder <code>.yaml</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>In den Repository-Einstellungen unter Actions</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Im Ordner <code>.git/hooks/</code></span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> GitHub sucht Workflows ausschließlich unter <code>.github/workflows/</code>. Sie sind damit normale, versionierte Dateien im Repository.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Warum beginnt fast jeder Job mit <code>uses: actions/checkout</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil sonst die Secrets fehlen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil der Runner eine frische Maschine ohne den Code des Repositorys ist</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil damit der Branch nach main gemergt wird</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil GitHub es aus Lizenzgründen verlangt</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Jeder Job läuft auf einer neuen, leeren Maschine. <code>actions/checkout</code> klont das Repository dorthin.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Welche Aussagen über Jobs und Steps stimmen?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Mehrere Jobs laufen standardmäßig parallel.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Mit <code>needs</code> wartet ein Job auf das erfolgreiche Ende eines anderen.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Schlägt ein Step fehl, werden die folgenden Steps des Jobs nicht ausgeführt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span>Alle Steps eines Workflows laufen immer auf derselben Maschine, auch über Jobs hinweg.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Steps eines Jobs teilen sich eine Maschine; jeder Job bekommt aber seine eigene. Abhängigkeiten zwischen Jobs drückt man mit <code>needs</code> aus.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Ein Workflow braucht einen API-Key. Wie wird er richtig eingebunden?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Direkt in die YAML-Datei schreiben</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>In eine Datei <code>key.txt</code> im Repository legen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Als Repository-Secret anlegen und mit <code>${{ secrets.NAME }}</code> verwenden</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>In die Commit-Message schreiben</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Secrets werden verschlüsselt gespeichert, in Logs maskiert und sind nicht Teil des Repositorys. Alles im Repository ist für alle mit Leserechten sichtbar.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Was bewirkt <strong>Require status checks to pass</strong> in einem Ruleset für main?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Workflows laufen nur noch auf main.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Ein Pull Request kann erst gemergt werden, wenn die ausgewählten Checks erfolgreich waren.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Fehlgeschlagene Checks werden automatisch wiederholt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Jeder Push löst eine Benachrichtigung an alle Collaborators aus.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Die Regel macht grüne Checks zur Bedingung für den Merge &mdash; zusammen mit dem Review ein automatisches Qualitätstor.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="2.4-pull-requests.html">&larr; Lektion 2.4: Pull Requests auf GitHub</a>
+      <span class="nav-center-info">Lektion 2.5</span>
+      <a class="nav-btn primary" href="index.html">Kurs&uuml;bersicht &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

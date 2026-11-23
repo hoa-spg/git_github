@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.2 &ndash; Rebase, Feature-Branches &amp; Pull Requests | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 2.2 &mdash; Teil 2: Branches &amp; Zusammenarbeit</p>
+      <h1>Rebase, Feature-Branches &amp; Pull Requests</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-gh">Rebase &amp; Workflow</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Fortgeschritten</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Erklären, was <code>git rebase</code> mit den Commits eines Branches macht</li>
+          <li>Merge und Rebase mit ihren Vor- und Nachteilen gegenüberstellen</li>
+          <li>Die goldene Regel des Rebase begründen und <code>--force-with-lease</code> richtig einsetzen</li>
+          <li>Mit <code>git pull --rebase</code> unnötige Merge-Commits vermeiden</li>
+          <li>Den Feature-Branch-Workflow (GitHub Flow) beschreiben und anwenden</li>
+          <li>Den Zweck eines Pull Requests erklären</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Das Problem: der Feature-Branch veraltet</h2>
+        <p>
+          Du arbeitest seit zwei Tagen auf <code>feature/kontakt</code>. In der Zwischenzeit haben Kolleginnen
+          mehrere Änderungen in <code>main</code> gemergt. Dein Branch basiert also auf einem alten Stand. Bevor du
+          deine Arbeit abgibst, solltest du die neuen Commits von <code>main</code> übernehmen &mdash; damit du siehst, ob
+          dein Code mit dem aktuellen Stand zusammenpasst, und mögliche Konflikte <em>auf deinem Branch</em>
+          löst statt auf <code>main</code>.
+        </p>
+        <p>Dafür gibt es zwei Wege:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Variante 1: Merge</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch feature/kontakt
+git merge main</code></pre>
+</div>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Variante 2: Rebase</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch feature/kontakt
+git rebase main</code></pre>
+</div>
+        <p>Beide führen zum selben <strong>Inhalt</strong> der Dateien, aber zu einer unterschiedlichen <strong>Historie</strong>.</p>
+      </section>
+
+      <section class="section">
+        <h2>2 — Was macht git rebase?</h2>
+        <p>
+          <em>Rebase</em> heißt „neu aufsetzen“: Git nimmt die Commits deines Branches, die noch nicht in
+          <code>main</code> sind, legt sie kurz beiseite, setzt den Branch auf den neuesten Commit von <code>main</code> und
+          spielt deine Commits dann <strong>einzeln, der Reihe nach, neu ab</strong>. Es sieht danach so aus,
+          als hättest du erst heute vom aktuellen <code>main</code> abgezweigt.
+        </p>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/merge-vs-rebase.svg" alt="Dieselbe Ausgangslage: Merge erzeugt einen Merge-Commit, Rebase erzeugt die Commits D und E neu (D′, E′) auf C." loading="lazy" style="max-width:720px"></div>
+  <figcaption>Dieselbe Ausgangslage: Merge erzeugt einen Merge-Commit, Rebase erzeugt die Commits D und E neu (D′, E′) auf C.</figcaption>
+</figure>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch feature/kontakt
+git rebase main
+# Successfully rebased and updated refs/heads/feature/kontakt.
+
+git log --oneline --graph --all
+# * 0c3a524 (HEAD -&gt; feature/kontakt) Kontaktformular gestylt
+# * 91be2d0 Kontaktformular ergänzt
+# * 562e58c (main) README ergänzt
+# * b15a50e Jahr im Footer aktualisiert</code></pre>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Neue Commits, neue Hashes</div>
+    <p>D′ und E′ haben denselben Inhalt und dieselben Messages wie D und E, sind aber <strong>neue
+          Commits</strong> mit neuen Hashes, weil sich ihr Vorgänger geändert hat (der Hash hängt auch vom
+          Vorgänger ab, siehe Lektion 1.1). Die alten Commits D und E existieren danach in keinem Branch mehr.</p>
+  </div>
+</div>
+        <p>
+          Haben deine Commits und die neuen Commits auf <code>main</code> dieselben Zeilen geändert, hält der Rebase
+          beim betroffenen Commit an und meldet einen Konflikt. Du löst ihn wie beim Merge (Datei
+          bearbeiten, <code>git add</code>), setzt dann aber mit <code>git rebase --continue</code> fort statt mit <code>git commit</code>.
+          Mit <code>git rebase --abort</code> brichst du ab und alles ist wie vorher. Lektion 2.3 zeigt beides an einem
+          Beispiel.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>3 — Merge oder Rebase?</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th></th><th>Merge</th><th>Rebase</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Historie</strong></td><td>bleibt exakt erhalten, verzweigt</td><td>wird umgeschrieben, linear</td></tr>
+              <tr><td><strong>Zusätzlicher Commit</strong></td><td>ja, ein Merge-Commit</td><td>nein</td></tr>
+              <tr><td><strong>Hashes</strong></td><td>bestehende Commits bleiben unverändert</td><td>die eigenen Commits bekommen neue Hashes</td></tr>
+              <tr><td><strong>Konflikte</strong></td><td>einmal, für alle Änderungen gemeinsam</td><td>evtl. mehrmals, einmal pro betroffenem Commit</td></tr>
+              <tr><td><strong>Lesbarkeit des Logs</strong></td><td>bei vielen Branches unübersichtlich</td><td>übersichtlich wie eine Liste</td></tr>
+              <tr><td><strong>Risiko</strong></td><td>gering, nichts geht verloren</td><td>gefährlich bei Commits, die andere schon haben</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>In der Praxis kombinieren viele Teams beides:</p>
+        <ul>
+          <li><strong>Eigenen, noch nicht geteilten Feature-Branch aktualisieren:</strong> Rebase auf <code>main</code> &mdash; die Historie bleibt sauber.</li>
+          <li><strong>Fertigen Feature-Branch in main übernehmen:</strong> Merge (meist über einen Pull Request auf GitHub).</li>
+          <li><strong>Gemeinsam genutzte Branches</strong> wie <code>main</code>: niemals rebasen.</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>4 — Die goldene Regel und force-with-lease</h2>
+        <div class="callout callout-error">
+  <div class="callout-icon">&#10007;</div>
+  <div class="callout-body">
+    <div class="callout-title">Goldene Regel des Rebase</div>
+    <p>Rebase niemals Commits, die bereits gepusht sind und auf denen andere aufbauen. Rebase also nie
+          <code>main</code> und nie einen Branch, an dem mehrere Personen arbeiten.</p>
+  </div>
+</div>
+        <p>
+          Warum? Hat Bob die Commits D und E schon geholt und darauf weitergearbeitet, und du ersetzt sie
+          durch D′ und E′, dann hat Bob plötzlich Commits, die es „offiziell“ nicht mehr gibt. Beim
+          nächsten Pull erscheinen dieselben Änderungen doppelt, und es gibt verwirrende Konflikte.
+        </p>
+        <h3>Den eigenen, schon gepushten Feature-Branch rebasen</h3>
+        <p>Hast du deinen Branch zur Sicherung schon gepusht, aber niemand anderer arbeitet darauf, ist ein Rebase in Ordnung. Ein normaler Push wird danach allerdings abgelehnt, weil die Commits am Server (D, E) im lokalen Branch nicht mehr vorkommen:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git push
+#  ! [rejected]        feature/kontakt -&gt; feature/kontakt (non-fast-forward)
+
+git push --force-with-lease
+#  + 7d3e1f0...0c3a524 feature/kontakt -&gt; feature/kontakt (forced update)</code></pre>
+</div>
+        <p>
+          <code>--force</code> würde den Branch am Server einfach überschreiben &mdash; auch mit Commits, die jemand
+          anderer inzwischen gepusht hat. <strong><code>--force-with-lease</code></strong> überschreibt nur, wenn der
+          Branch am Server noch genau dort steht, wo du ihn zuletzt gesehen hast. Hat jemand
+          dazwischen gepusht, bricht der Befehl ab.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>5 — Rebase beim Pull</h2>
+        <p>
+          Ein Rebase hilft auch im Alltag: Du hast auf <code>main</code> einen Commit gemacht, eine Kollegin hat
+          inzwischen ebenfalls gepusht. Ein normales <code>git pull</code> (mit <code>pull.rebase false</code> aus Lektion 1.2)
+          erzeugt einen Merge-Commit „Merge branch 'main' of github.com:…“ &mdash; bei vielen Personen
+          entstehen so dutzende nichtssagende Merge-Commits.
+        </p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git pull --rebase
+# Successfully rebased and updated refs/heads/main.</code></pre>
+</div>
+        <p>
+          <code>--rebase</code> setzt deine noch <strong>nicht gepushten</strong> Commits auf den neuen Stand vom
+          Server. Das verletzt die goldene Regel nicht, weil diese Commits noch niemand hat. Wer das immer
+          so möchte, stellt <code>git config --global pull.rebase true</code> ein.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>6 — Vertiefung: Commits aufräumen mit interaktivem Rebase</h2>
+        <p>Vor dem Abgeben möchtest du vielleicht Commits wie „WIP“, „typo“ und „jetzt aber“ zu einem sinnvollen Commit zusammenfassen. Ein interaktiver Rebase öffnet dafür eine Liste der letzten Commits im Editor:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git rebase -i HEAD~3      # die letzten 3 Commits bearbeiten</code></pre>
+</div>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Editor – git-rebase-todo</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext">pick 91be2d0 Kontaktformular ergänzt
+squash 3fa1c22 typo
+squash 7d3e1f0 jetzt aber</code></pre>
+</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Anweisung</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td><code>pick</code></td><td>Commit unverändert übernehmen</td></tr>
+              <tr><td><code>reword</code></td><td>Commit übernehmen, Message ändern</td></tr>
+              <tr><td><code>squash</code></td><td>mit dem vorherigen Commit verschmelzen (Messages werden kombiniert)</td></tr>
+              <tr><td><code>fixup</code></td><td>wie squash, Message dieses Commits verwerfen</td></tr>
+              <tr><td><code>drop</code></td><td>Commit entfernen</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p><code>HEAD~3</code> bedeutet „drei Commits vor HEAD“. Nach dem Speichern und Schließen führt Git die Anweisungen von oben nach unten aus. Auch hier gilt die goldene Regel: nur für Commits, die noch niemand anderer hat.</p>
+      </section>
+
+      <section class="section">
+        <h2>7 — Der Feature-Branch-Workflow</h2>
+        <p>Mit Branches, Merge und Rebase lässt sich die Zusammenarbeit im Team klar regeln. Der verbreitetste Ablauf ist der <strong>Feature-Branch-Workflow</strong>, auf GitHub auch <strong>GitHub Flow</strong> genannt:</p>
+        <figure class="figure">
+  <div class="figure-img"><img src="assets/img/feature-branch-workflow.svg" alt="Feature-Branch-Workflow: Jede Änderung entsteht auf einem eigenen Branch und kommt über einen Pull Request nach main." loading="lazy" style="max-width:720px"></div>
+  <figcaption>Feature-Branch-Workflow: Jede Änderung entsteht auf einem eigenen Branch und kommt über einen Pull Request nach main.</figcaption>
+</figure>
+        <ol>
+          <li><strong>Branch erstellen</strong> vom aktuellen <code>main</code>: <code>git switch main</code>, <code>git pull</code>, <code>git switch -c feature/kontaktformular</code>.</li>
+          <li><strong>Commits</strong> auf dem Branch &mdash; klein und mit guten Messages.</li>
+          <li><strong>Pushen</strong> und auf GitHub einen <strong>Pull Request</strong> öffnen (Abschnitt 8).</li>
+          <li>Teammitglieder prüfen den Code (<strong>Review</strong>), automatische Tests laufen (<strong>Checks</strong>). Änderungswünsche werden als weitere Commits auf demselben Branch umgesetzt.</li>
+          <li><strong>Merge</strong> in <code>main</code>, sobald alles passt.</li>
+          <li><strong>Branch löschen</strong> &mdash; lokal und am Server. Für die nächste Aufgabe beginnt alles wieder bei 1.</li>
+        </ol>
+        <div class="do-dont">
+          <div class="do-box">
+            <h4>DO</h4>
+            <ul>
+              <li>Ein Branch pro Aufgabe, kurzlebig (Stunden bis wenige Tage)</li>
+              <li>Vor dem Abgeben auf den aktuellen <code>main</code> rebasen oder <code>main</code> hineinmergen</li>
+              <li>Regelmäßig pushen &mdash; auch als Sicherung</li>
+            </ul>
+          </div>
+          <div class="dont-box">
+            <h4>DON'T</h4>
+            <ul>
+              <li>Direkt auf <code>main</code> committen</li>
+              <li>Ein Branch, der wochenlang wächst und alles enthält</li>
+              <li>Mehrere unabhängige Funktionen in einem Branch</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Andere Workflows</div>
+    <p>Größere Projekte mit festen Release-Terminen verwenden manchmal <strong>Git Flow</strong> mit einem zusätzlichen Branch <code>develop</code> sowie eigenen <code>release/…</code>- und <code>hotfix/…</code>-Branches. Das andere Extrem ist <strong>Trunk-Based Development</strong>: sehr kurze Branches, die mehrmals täglich nach <code>main</code> gehen. Für Schul- und die meisten Webprojekte ist der Feature-Branch-Workflow die richtige Wahl.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>8 — Die Idee des Pull Requests</h2>
+        <p>
+          Ein <strong>Pull Request</strong> (PR, bei GitLab „Merge Request“) ist eine Anfrage auf GitHub:
+          „Bitte übernehmt die Commits aus meinem Branch <code>feature/kontaktformular</code> in <code>main</code>.“ Technisch
+          endet ein PR mit einem Merge &mdash; aber vorher bietet er einen Ort für die Zusammenarbeit:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Funktion</th><th>Nutzen</th></tr></thead>
+            <tbody>
+              <tr><td>Beschreibung</td><td>Was wurde geändert und warum? Wie kann man es testen?</td></tr>
+              <tr><td>Diff aller Änderungen</td><td>Alle Commits des Branches gegenüber <code>main</code> auf einen Blick</td></tr>
+              <tr><td>Code Review</td><td>Kommentare zu einzelnen Zeilen, Zustimmung oder Änderungswünsche</td></tr>
+              <tr><td>Automatische Checks</td><td>Tests und Prüfungen laufen bei jedem Push (Lektion 2.5)</td></tr>
+              <tr><td>Merge-Button</td><td>Übernahme in <code>main</code> per Klick, wenn alles grün ist</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          So kommt kein Code ungeprüft nach <code>main</code>, und das Team lernt voneinander. Wie ein PR auf GitHub
+          konkret erstellt, geprüft und gemergt wird, zeigt Lektion 2.4.
+        </p>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 2.2</span>
+    <h3>Kontaktbereich mit Rebase aktualisieren</h3>
+  </div>
+<ol>
+            <li>Lege <code>feature/kontakt</code> an, ergänze einen Kontaktbereich und committe. Pushe den Branch mit <code>-u</code>.</li>
+            <li>Simuliere die Arbeit einer Kollegin: Bearbeite auf GitHub direkt in <code>main</code> die Datei <code>README.md</code> und committe dort.</li>
+            <li>Hole den neuen Stand von <code>main</code> und setze deinen Branch darauf neu auf.</li>
+            <li>Pushe den Branch mit <code>--force-with-lease</code> und merge ihn per Fast-Forward in <code>main</code>.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">index.html – Ausschnitt</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;h2&gt;Kontakt&lt;/h2&gt;
+&lt;p&gt;E-Mail: &lt;a href="mailto:max@example.com"&gt;max@example.com&lt;/a&gt;&lt;/p&gt;</code></pre>
+</div>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/kontakt
+git commit -am "Kontaktbereich ergänzt"
+git push -u origin feature/kontakt
+# ... README auf GitHub in main ändern ...
+git switch main
+git pull
+git switch feature/kontakt
+git rebase main
+git push --force-with-lease
+git switch main
+git merge feature/kontakt        # Fast-forward
+git push
+git branch -d feature/kontakt
+git push origin --delete feature/kontakt
+git log --oneline --graph</code></pre>
+</div>
+          <p><strong>Ergebnis:</strong> Die Historie von <code>main</code> ist linear, ohne Merge-Commit.</p>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: main rebasen</div>
+  <p>Jemand führt auf <code>main</code> <code>git rebase feature/x</code> aus und pusht mit <code>--force</code>. Alle anderen bekommen beim nächsten Pull doppelte Commits und Konflikte.</p>
+          <p class="fehler-fix">Gemeinsam genutzte Branches nie rebasen und nie force-pushen. Rebase nur für den eigenen Feature-Branch; Änderungen kommen über Merge bzw. Pull Request nach <code>main</code>. Auf GitHub kann man Force-Pushes auf <code>main</code> verbieten (Lektion 2.4).</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Nach dem Rebase git pull statt force-with-lease</div>
+  <p>Nach dem Rebase wird der Push abgelehnt; die Hinweismeldung schlägt <code>git pull</code> vor. Danach enthält der Branch die alten <em>und</em> die neuen Commits samt Merge-Commit.</p>
+          <p class="fehler-fix">Nach einem Rebase eines eigenen, bereits gepushten Branches ist die Ablehnung erwartet: <code>git push --force-with-lease</code> verwenden.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Während des Rebase committen</div>
+  <p>Nach dem Lösen eines Konflikts beim Rebase wird <code>git commit</code> ausgeführt; Git zeigt danach verwirrende Meldungen.</p>
+          <p class="fehler-fix">Beim Rebase nach dem Lösen nur <code>git add</code> und dann <code>git rebase --continue</code>. Im Zweifel mit <code>git rebase --abort</code> zurück zum Ausgangszustand.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Merge und Rebase vergleichen</span>
+  </div>
+  <p>Erzeuge in einem Übungsrepository die Ausgangslage aus der Abbildung (main: A–B–C, feature: D–E ab B). Kopiere den Ordner einmal (z.&nbsp;B. <code>cp -r uebung uebung-rebase</code>). Führe im Original <code>git merge main</code> und in der Kopie <code>git rebase main</code> auf dem Feature-Branch aus. Vergleiche <code>git log --oneline --graph --all</code> und die Hashes von D und E.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Aufräumen</span>
+  </div>
+  <p>Mache auf einem Branch vier kleine Commits, darunter zwei mit Messages wie „typo“. Fasse sie mit <code>git rebase -i</code> zu zwei sinnvollen Commits zusammen und ändere dabei eine Message mit <code>reword</code>.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">Workflow-Regeln fürs Team</span>
+  </div>
+  <p>Ihr startet zu dritt ein Projekt. Schreibt eine kurze Datei <code>CONTRIBUTING.md</code> mit euren Regeln: Branch-Namen, wann wird gerebased, wann gemergt, wer darf nach <code>main</code>, Format der Commit-Messages. Begründet jede Regel in einem Satz.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Learn Git Branching: Rebase</span>
+  </div>
+  <p>Bearbeite auf <strong>learngitbranching.js.org</strong> die Levels „Introduction Sequence 4“ (Rebase Introduction) und „Moving Work Around“. Erkläre anschließend, was <code>git cherry-pick</code> macht und wann es nützlich ist.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was passiert bei <code>git rebase main</code> auf einem Feature-Branch?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein Merge-Commit verbindet den Feature-Branch mit main.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Die Commits des Feature-Branches werden auf dem neuesten Commit von main neu erzeugt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>main wird auf den Stand des Feature-Branches gesetzt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Der Feature-Branch wird gelöscht.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Rebase spielt die eigenen Commits auf einer neuen Basis neu ab. Dabei entstehen neue Commits mit neuen Hashes; main selbst bleibt unverändert.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Wie lautet die goldene Regel des Rebase?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase nur, wenn es keine Konflikte gibt.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase immer vor jedem Commit.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Rebase keine Commits, die bereits geteilt sind und auf denen andere aufbauen.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase nur auf main.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Rebase ersetzt Commits durch neue. Haben andere die alten Commits schon, entstehen Duplikate und Konflikte. Deshalb nie gemeinsam genutzte Branches wie main rebasen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Warum ist <code>git push --force-with-lease</code> sicherer als <code>git push --force</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil es nur funktioniert, wenn keine Konflikte bestehen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Weil es abbricht, wenn jemand anderer inzwischen auf den Branch gepusht hat</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil es vorher automatisch einen Pull macht</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil es nur lokale Branches betrifft</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>--force-with-lease</code> überschreibt nur, wenn der Server-Branch noch dem zuletzt bekannten Stand entspricht. So werden fremde Commits nicht versehentlich überschrieben.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Aussagen zum Feature-Branch-Workflow stimmen?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Jede Aufgabe bekommt einen eigenen, kurzlebigen Branch.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Alle arbeiten direkt auf main, Branches gibt es nur für Releases.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Änderungen kommen über einen Pull Request mit Review nach main.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Nach dem Merge wird der Feature-Branch gelöscht.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Im Feature-Branch-Workflow bleibt main stabil; neue Arbeit entsteht auf kurzlebigen Branches, die nach Review per Pull Request gemergt und dann gelöscht werden.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Beim Rebase tritt ein Konflikt auf. Du hast die Datei korrigiert. Wie geht es weiter?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git commit -m "Konflikt gelöst"</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span><code>git add datei</code> und dann <code>git rebase --continue</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git push --force</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git merge --continue</code></span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Beim Rebase wird die gelöste Datei vorgemerkt und der Rebase mit <code>--continue</code> fortgesetzt. Git erstellt den Commit dabei selbst.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="2.1-branches-merge.html">&larr; Lektion 2.1: Branches &amp; Merge</a>
+      <span class="nav-center-info">Lektion 2.2</span>
+      <a class="nav-btn primary" href="2.3-merge-konflikt-demo.html">Lektion 2.3: Demo: Merge-Konflikt mit Alice &amp; Bob &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>

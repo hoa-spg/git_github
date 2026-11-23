@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" viewBox="0 0 720 410" width="720" height="410">
+  <rect width="720" height="410" fill="#fff"/>
+  <text x="20" y="28" font-weight="700">Ausgangslage</text>
+  <line x1="60" y1="70" x2="240" y2="70" stroke="#555" stroke-width="2"/> <line x1="150" y1="70" x2="200" y2="110" stroke="#555" stroke-width="2"/> <line x1="200" y1="110" x2="280" y2="110" stroke="#555" stroke-width="2"/>
+  <circle cx="60" cy="70" r="14" fill="#fff4ef" stroke="#333"/><text x="60" y="75" text-anchor="middle" font-size="12" font-weight="600">A</text> <circle cx="150" cy="70" r="14" fill="#fff4ef" stroke="#333"/><text x="150" y="75" text-anchor="middle" font-size="12" font-weight="600">B</text> <circle cx="240" cy="70" r="14" fill="#fff4ef" stroke="#333"/><text x="240" y="75" text-anchor="middle" font-size="12" font-weight="600">C</text> <circle cx="200" cy="110" r="14" fill="#ede9fe" stroke="#333"/><text x="200" y="115" text-anchor="middle" font-size="12" font-weight="600">D</text> <circle cx="280" cy="110" r="14" fill="#ede9fe" stroke="#333"/><text x="280" y="115" text-anchor="middle" font-size="12" font-weight="600">E</text>
+  <rect x="206" y="27" width="68" height="24" rx="12" fill="#f1502f"/><text x="240" y="44" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">main</text> <rect x="326" y="97" width="68" height="24" rx="12" fill="#7c3aed"/><text x="360" y="114" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">feature</text>
+  <line x1="20" y1="140" x2="700" y2="140" stroke="#ddd"/>
+  <text x="20" y="166" font-weight="700">git merge main</text>
+  <text x="20" y="184" font-size="12" fill="#555">(im Branch feature)</text>
+  <line x1="60" y1="220" x2="240" y2="220" stroke="#555" stroke-width="2"/> <line x1="150" y1="220" x2="200" y2="260" stroke="#555" stroke-width="2"/> <line x1="200" y1="260" x2="280" y2="260" stroke="#555" stroke-width="2"/> <line x1="280" y1="260" x2="360" y2="260" stroke="#555" stroke-width="2"/> <line x1="240" y1="220" x2="360" y2="260" stroke="#555" stroke-width="2"/>
+  <circle cx="60" cy="220" r="14" fill="#fff4ef" stroke="#333"/><text x="60" y="225" text-anchor="middle" font-size="12" font-weight="600">A</text> <circle cx="150" cy="220" r="14" fill="#fff4ef" stroke="#333"/><text x="150" y="225" text-anchor="middle" font-size="12" font-weight="600">B</text> <circle cx="240" cy="220" r="14" fill="#fff4ef" stroke="#333"/><text x="240" y="225" text-anchor="middle" font-size="12" font-weight="600">C</text> <circle cx="200" cy="260" r="14" fill="#ede9fe" stroke="#333"/><text x="200" y="265" text-anchor="middle" font-size="12" font-weight="600">D</text> <circle cx="280" cy="260" r="14" fill="#ede9fe" stroke="#333"/><text x="280" y="265" text-anchor="middle" font-size="12" font-weight="600">E</text> <circle cx="360" cy="260" r="14" fill="#fde68a" stroke="#333"/><text x="360" y="265" text-anchor="middle" font-size="12" font-weight="600">M</text>
+  <rect x="206" y="179" width="68" height="24" rx="12" fill="#f1502f"/><text x="240" y="196" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">main</text> <rect x="406" y="247" width="68" height="24" rx="12" fill="#7c3aed"/><text x="440" y="264" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">feature</text>
+  <text x="490" y="215" font-size="12" fill="#555">+ Historie bleibt unverändert</text>
+  <text x="490" y="233" font-size="12" fill="#555">+ zeigt, wann gemergt wurde</text>
+  <text x="490" y="251" font-size="12" fill="#555">− zusätzlicher Merge-Commit,</text>
+  <text x="490" y="267" font-size="12" fill="#555">  verzweigtes Log</text>
+  <line x1="20" y1="290" x2="700" y2="290" stroke="#ddd"/>
+  <text x="20" y="316" font-weight="700">git rebase main</text>
+  <text x="20" y="334" font-size="12" fill="#555">(im Branch feature)</text>
+  <line x1="60" y1="370" x2="400" y2="370" stroke="#555" stroke-width="2"/>
+  <circle cx="60" cy="370" r="14" fill="#fff4ef" stroke="#333"/><text x="60" y="375" text-anchor="middle" font-size="12" font-weight="600">A</text> <circle cx="150" cy="370" r="14" fill="#fff4ef" stroke="#333"/><text x="150" y="375" text-anchor="middle" font-size="12" font-weight="600">B</text> <circle cx="240" cy="370" r="14" fill="#fff4ef" stroke="#333"/><text x="240" y="375" text-anchor="middle" font-size="12" font-weight="600">C</text> <circle cx="320" cy="370" r="14" fill="#ede9fe" stroke="#333"/><text x="320" y="375" text-anchor="middle" font-size="12" font-weight="600">D′</text> <circle cx="400" cy="370" r="14" fill="#ede9fe" stroke="#333"/><text x="400" y="375" text-anchor="middle" font-size="12" font-weight="600">E′</text>
+  <rect x="206" y="329" width="68" height="24" rx="12" fill="#f1502f"/><text x="240" y="346" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">main</text> <rect x="366" y="329" width="68" height="24" rx="12" fill="#7c3aed"/><text x="400" y="346" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">feature</text>
+  <text x="490" y="352" font-size="12" fill="#555">+ lineare, gut lesbare Historie</text>
+  <text x="490" y="370" font-size="12" fill="#555">− D und E werden neu erzeugt</text>
+  <text x="490" y="386" font-size="12" fill="#555">  (neue Hashes D′, E′)</text>
+</svg>

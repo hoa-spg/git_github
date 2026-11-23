@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<!-- GENERIERT von kurse/_build (git_github) – nicht direkt bearbeiten!
+     Quelle: kurse/_build/git_github/lessons/, bauen: python3 _build/build.py git_github -->
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.4 &ndash; Pull Requests auf GitHub | Git &amp; GitHub Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9095;</span>
+        <div>
+          <div class="brand-name">Git &amp; GitHub</div>
+          <div class="brand-sub">Web- und Mobile Computing</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label git-label">Teil 1 &mdash; Git-Grundlagen &amp; Werkzeuge</div>
+        <a class="nav-link" href="1.1-sinn-und-zweck.html"><span class="ln">1.1</span>Sinn und Zweck von Git</a>
+        <a class="nav-link" href="1.2-github-einrichten.html"><span class="ln">1.2</span>Git &amp; GitHub einrichten</a>
+        <a class="nav-link" href="1.3-arbeitsalltag.html"><span class="ln">1.3</span>Der Arbeitsalltag mit Git</a>
+        <a class="nav-link" href="1.4-vscode-intellij.html"><span class="ln">1.4</span>Git in VS Code und IntelliJ</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label gh-label">Teil 2 &mdash; Branches &amp; Zusammenarbeit</div>
+        <a class="nav-link" href="2.1-branches-merge.html"><span class="ln">2.1</span>Branches &amp; Merge</a>
+        <a class="nav-link" href="2.2-rebase-feature-branches.html"><span class="ln">2.2</span>Rebase, Feature-Branches &amp; Pull Requests</a>
+        <a class="nav-link" href="2.3-merge-konflikt-demo.html"><span class="ln">2.3</span>Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+        <a class="nav-link" href="2.4-pull-requests.html"><span class="ln">2.4</span>Pull Requests auf GitHub</a>
+        <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 2.4 &mdash; Teil 2: Branches &amp; Zusammenarbeit</p>
+      <h1>Pull Requests auf GitHub</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-gh">Pull Requests</span>
+        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-level">Fortgeschritten</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Andere Personen als Collaborators zu einem Repository einladen</li>
+          <li>Einen Pull Request mit aussagekräftiger Beschreibung erstellen</li>
+          <li>Code Reviews durchführen: kommentieren, Änderungen vorschlagen, zustimmen</li>
+          <li>Die drei Merge-Varianten auf GitHub unterscheiden und passend wählen</li>
+          <li><code>main</code> mit Branch-Regeln vor direkten Pushes schützen</li>
+          <li>Pull Requests mit Issues verknüpfen und den Fork-Workflow erklären</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 — Zusammenarbeit einrichten</h2>
+        <p>Ein öffentliches Repository kann jeder lesen, aber nur du darfst pushen. Damit dein Team Branches pushen kann, lädst du die Mitglieder als <strong>Collaborators</strong> ein:</p>
+        <ol>
+          <li>Repository &rarr; <strong>Settings</strong> &rarr; <strong>Collaborators</strong> &rarr; <strong>Add people</strong>.</li>
+          <li>GitHub-Benutzernamen eingeben und einladen.</li>
+          <li>Die eingeladene Person nimmt die Einladung per E-Mail oder unter <em>github.com/&lt;owner&gt;/&lt;repo&gt;/invitations</em> an.</li>
+        </ol>
+        <p>Collaborators eines persönlichen Repositorys haben Schreibrechte: Sie dürfen klonen, Branches pushen, Pull Requests mergen. Für größere Teams legt man eine <strong>Organization</strong> an (z.&nbsp;B. für ein Diplomarbeitsteam), in der Rechte feiner vergeben werden können.</p>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Ohne Schreibrechte: Fork</div>
+    <p>Wer kein Collaborator ist &mdash; typisch bei Open-Source-Projekten &mdash; arbeitet mit einem
+          <strong>Fork</strong>, einer eigenen Kopie des Repositorys (Abschnitt 8).</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>2 — Einen Pull Request erstellen</h2>
+        <p>Ausgangspunkt ist ein gepushter Feature-Branch (Lektion 2.1):</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch -c feature/projekte
+git commit -am "Abschnitt Projekte ergänzt"
+git push -u origin feature/projekte
+# remote: Create a pull request for 'feature/projekte' on GitHub by visiting:
+# remote:      https://github.com/maxmuster/steckbrief/pull/new/feature/projekte</code></pre>
+</div>
+        <p>Auf GitHub erscheint danach ein gelber Hinweis mit dem Button <strong>Compare &amp; pull request</strong>. Alternativ: Reiter <strong>Pull requests</strong> &rarr; <strong>New pull request</strong>. Wichtig ist die Richtung:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Feld</th><th>Bedeutung</th><th>Beispiel</th></tr></thead>
+            <tbody>
+              <tr><td><strong>base</strong></td><td>Ziel: hierhin soll gemergt werden</td><td><code>main</code></td></tr>
+              <tr><td><strong>compare</strong></td><td>Quelle: dein Branch mit den neuen Commits</td><td><code>feature/projekte</code></td></tr>
+              <tr><td>Title</td><td>kurz, wie eine gute Commit-Message</td><td>Abschnitt „Projekte“ mit drei Schulprojekten</td></tr>
+              <tr><td>Description</td><td>Was, warum, wie testen? (Markdown)</td><td>siehe unten</td></tr>
+              <tr><td>Reviewers</td><td>wer den Code prüfen soll</td><td>Teammitglied</td></tr>
+              <tr><td>Assignees, Labels</td><td>wer verantwortlich ist, Kategorie</td><td>du, „enhancement“</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Beschreibungen und Kommentare auf GitHub sind in <strong>Markdown</strong> geschrieben: <code>## </code> für Überschriften, <code>- </code> für Listen, <code>- [ ] </code> für Checkboxen, <code>`code`</code> für Code, <code>**fett**</code>. Ein gutes Muster:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Pull-Request-Beschreibung (Markdown)</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext">## Was wurde geändert?
+- Neuer Abschnitt „Projekte“ mit drei Karten
+- Styling für die Karten in style.css
+
+## Warum?
+Die Startseite soll zeigen, woran ich in der Schule gearbeitet habe.
+
+## Wie testen?
+1. index.html im Browser öffnen
+2. Auf Handybreite prüfen: Karten stehen untereinander
+
+Closes #3</code></pre>
+</div>
+        <p>
+          <code>Closes #3</code> verknüpft den PR mit Issue Nummer 3 (Abschnitt 7). Mit <strong>Create pull request</strong>
+          wird der PR geöffnet. Wer noch nicht fertig ist, aber schon Feedback möchte, wählt im Pfeilmenü
+          <strong>Create draft pull request</strong>: Ein Draft kann nicht gemergt werden, bis er mit
+          <strong>Ready for review</strong> freigegeben wird.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>3 — Die Seite eines Pull Requests</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Reiter</th><th>Inhalt</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Conversation</strong></td><td>Beschreibung, Kommentare, Reviews, Zeitleiste aller Ereignisse; unten Status der Checks und der Merge-Button</td></tr>
+              <tr><td><strong>Commits</strong></td><td>alle Commits des Branches, die noch nicht in <code>base</code> sind</td></tr>
+              <tr><td><strong>Checks</strong></td><td>Ergebnisse automatischer Prüfungen (Lektion 2.5)</td></tr>
+              <tr><td><strong>Files changed</strong></td><td>der gesamte Diff gegenüber <code>base</code> &mdash; hier findet das Review statt</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Ein PR ist an den <strong>Branch</strong> gebunden, nicht an einzelne Commits: Jeder weitere Push auf
+          <code>feature/projekte</code> erscheint automatisch im offenen PR. Änderungswünsche setzt du also einfach mit
+          neuen Commits auf demselben Branch um &mdash; kein neuer PR nötig.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>4 — Code Review</h2>
+        <p>Im Reiter <strong>Files changed</strong> prüft die Reviewerin den Code:</p>
+        <ul>
+          <li>Mit dem <strong>+</strong> neben einer Zeilennummer (oder durch Ziehen über mehrere Zeilen) schreibt sie einen Kommentar zu genau dieser Stelle.</li>
+          <li><strong>Add single comment</strong> veröffentlicht sofort; <strong>Start a review</strong> sammelt mehrere Kommentare und schickt sie gemeinsam ab.</li>
+          <li>Mit dem Symbol <strong>Add a suggestion</strong> (Plus-Minus-Zeichen) schlägt sie eine konkrete Änderung vor. Der Autor übernimmt sie per Klick auf <strong>Commit suggestion</strong> &mdash; GitHub erstellt dafür einen Commit auf dem Branch.</li>
+          <li>Das Häkchen <strong>Viewed</strong> klappt fertig geprüfte Dateien zu.</li>
+        </ul>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Kommentar mit Änderungsvorschlag (Markdown)</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext">Das alt-Attribut sollte beschreiben, was auf dem Bild zu sehen ist:
+```suggestion
+  &lt;img src="roboter.jpg" alt="Selbstgebauter Roboter beim Schulwettbewerb"&gt;
+```</code></pre>
+</div>
+        <p>Abgeschlossen wird das Review oben rechts mit <strong>Review changes</strong> (bzw. <strong>Submit review</strong>):</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Ergebnis</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Comment</strong></td><td>Feedback ohne Entscheidung</td></tr>
+              <tr><td><strong>Approve</strong></td><td>Zustimmung &mdash; aus Sicht der Reviewerin kann gemergt werden</td></tr>
+              <tr><td><strong>Request changes</strong></td><td>Änderungen nötig, bevor gemergt werden darf</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Der Autor beantwortet Kommentare, pusht Korrekturen und markiert erledigte Diskussionen mit <strong>Resolve conversation</strong>. Danach fordert er mit dem Pfeilsymbol neben dem Namen der Reviewerin ein erneutes Review an.</p>
+        <div class="do-dont">
+          <div class="do-box">
+            <h4>Gutes Review</h4>
+            <ul>
+              <li>Freundlich und sachlich, über den Code, nicht über die Person</li>
+              <li>Begründen: „… weil Screenreader sonst nichts vorlesen“</li>
+              <li>Fragen stellen statt befehlen: „Was hältst du von …?“</li>
+              <li>Auch Gelungenes erwähnen</li>
+            </ul>
+          </div>
+          <div class="dont-box">
+            <h4>Schlechtes Review</h4>
+            <ul>
+              <li>„Das ist falsch.“ ohne Erklärung</li>
+              <li>Approve, ohne den Code gelesen zu haben</li>
+              <li>Streit über Geschmacksfragen, die ein Formatierungstool regeln könnte</li>
+              <li>Riesige PRs mit 2000 Zeilen anfordern &mdash; oder liefern</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>5 — Konflikte im Pull Request</h2>
+        <p>Wurde in der Zwischenzeit etwas nach <code>main</code> gemergt, das mit deinem Branch kollidiert, zeigt GitHub <em>This branch has conflicts that must be resolved</em>, und der Merge-Button ist gesperrt. Du löst den Konflikt genau wie in Lektion 2.3 &mdash; auf deinem Branch:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+git pull
+git switch feature/projekte
+git merge main            # Konflikt lösen, git add, git commit
+git push                  # der PR aktualisiert sich, der Konflikt ist weg</code></pre>
+</div>
+        <p>Für kleine Konflikte bietet GitHub auch den Button <strong>Resolve conflicts</strong> mit einem Editor im Browser. Gibt es keinen Konflikt, aber <code>main</code> ist weiter, holt <strong>Update branch</strong> den neuen Stand per Merge (oder im Pfeilmenü per Rebase) in deinen Branch.</p>
+      </section>
+
+      <section class="section">
+        <h2>6 — Mergen: drei Varianten</h2>
+        <p>Sind Reviews und Checks in Ordnung, wird der PR über den grünen Button gemergt. Das Pfeilmenü daneben bietet drei Varianten:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Variante</th><th>Ergebnis in main</th><th>Geeignet für</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Create a merge commit</strong></td><td>Alle Commits des Branches plus ein Merge-Commit „Merge pull request #7 from …“ (wie <code>git merge --no-ff</code>)</td><td>Branches mit sauberen, einzeln wertvollen Commits; vollständige Historie</td></tr>
+              <tr><td><strong>Squash and merge</strong></td><td>Alle Commits des Branches werden zu <strong>einem</strong> neuen Commit zusammengefasst</td><td>Branches mit vielen kleinen „WIP“/„fix typo“-Commits; ein Commit pro Feature in main</td></tr>
+              <tr><td><strong>Rebase and merge</strong></td><td>Die Commits werden einzeln auf <code>main</code> neu erzeugt, kein Merge-Commit (wie Lektion 2.2)</td><td>lineare Historie mit allen Einzelcommits</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Welche Varianten erlaubt sind, legt der Repository-Owner unter <em>Settings &rarr; General &rarr; Pull Requests</em> fest. Dort lässt sich auch <strong>Automatically delete head branches</strong> aktivieren.</p>
+        <h3>Nach dem Merge aufräumen</h3>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+git pull                     # der Merge ist am Server passiert – jetzt lokal holen
+git branch -d feature/projekte
+git fetch --prune            # gelöschte Server-Branches auch aus origin/… entfernen</code></pre>
+</div>
+        <div class="callout callout-warning">
+  <div class="callout-icon">&#9888;</div>
+  <div class="callout-body">
+    <div class="callout-title">Nach Squash oder Rebase: -d verweigert</div>
+    <p>Bei <em>Squash and merge</em> und <em>Rebase and merge</em> landen in <code>main</code> <strong>neue</strong>
+          Commits; deine ursprünglichen Commits kommen dort nicht vor. <code>git branch -d</code> meldet deshalb
+          <em>not fully merged</em>. Wenn der PR auf GitHub als <em>Merged</em> angezeigt wird, ist <code>git branch -D</code>
+          gefahrlos. Arbeite danach nicht auf dem alten Branch weiter, sondern beginne einen neuen von <code>main</code>.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>7 — Issues und Pull Requests verknüpfen</h2>
+        <p>
+          <strong>Issues</strong> (Reiter <em>Issues</em>) sind die Aufgabenliste eines Repositorys: Fehler,
+          Wünsche, Fragen. Jedes Issue hat eine Nummer, z.&nbsp;B. #3, kann Personen zugewiesen und mit Labels
+          versehen werden. Erwähnungen wie <code>#3</code> in Commits, Kommentaren oder PRs werden automatisch zu Links.
+        </p>
+        <p>Steht in der PR-Beschreibung eines der Schlüsselwörter <strong>Closes</strong>, <strong>Fixes</strong> oder <strong>Resolves</strong> vor der Nummer, wird das Issue beim Merge in den Standard-Branch automatisch geschlossen:</p>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">PR-Beschreibung</span>
+    <span class="code-lang">Text</span>
+  </div>
+  <pre><code class="language-plaintext">Fixes #12
+Closes #14</code></pre>
+</div>
+        <div class="callout callout-tip">
+  <div class="callout-icon">&#128161;</div>
+  <div class="callout-body">
+    <div class="callout-title">Projektplanung</div>
+    <p>Mit <strong>Projects</strong> (Reiter im Repository oder Profil) ordnest du Issues und PRs auf einem
+          Kanban-Board (z.&nbsp;B. „Todo / In Progress / Done“) &mdash; nützlich für Gruppen- und Diplomarbeiten.</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>8 — main schützen: Branch-Regeln</h2>
+        <p>
+          Im Feature-Branch-Workflow soll niemand direkt auf <code>main</code> pushen. Das lässt sich erzwingen:
+          <em>Settings &rarr; Rules &rarr; Rulesets &rarr; New ruleset &rarr; New branch ruleset</em>
+          (ältere Variante: <em>Settings &rarr; Branches &rarr; Add branch protection rule</em>).
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Einstellung</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td>Target branches: <strong>Include default branch</strong></td><td>Regeln gelten für <code>main</code></td></tr>
+              <tr><td>Enforcement status: <strong>Active</strong></td><td>Regeln werden durchgesetzt</td></tr>
+              <tr><td><strong>Restrict deletions</strong></td><td><code>main</code> kann nicht gelöscht werden</td></tr>
+              <tr><td><strong>Block force pushes</strong></td><td>kein <code>--force</code> auf <code>main</code></td></tr>
+              <tr><td><strong>Require a pull request before merging</strong></td><td>Änderungen nur über PRs; direkte Pushes werden abgelehnt</td></tr>
+              <tr><td>&nbsp;&nbsp;&nbsp;Required approvals: 1</td><td>mindestens eine Zustimmung nötig</td></tr>
+              <tr><td><strong>Require status checks to pass</strong></td><td>Merge erst, wenn die automatischen Prüfungen grün sind (Lektion 2.5)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Ein direkter Push auf <code>main</code> wird danach vom Server abgelehnt (<em>GH013: Repository rule violations found</em>).</p>
+        <div class="callout callout-info">
+  <div class="callout-icon">&#8505;</div>
+  <div class="callout-body">
+    <div class="callout-title">Öffentlich oder privat</div>
+    <p>In öffentlichen Repositories sind diese Regeln kostenlos. Für private Repositories braucht man
+          einen kostenpflichtigen Plan &mdash; oder GitHub Pro aus dem Student Developer Pack (Lektion 1.2).</p>
+  </div>
+</div>
+      </section>
+
+      <section class="section">
+        <h2>9 — Forks: Beitragen ohne Schreibrechte</h2>
+        <p>Um zu einem fremden Projekt beizutragen, z.&nbsp;B. einen Fehler in einer Open-Source-Bibliothek zu beheben:</p>
+        <ol>
+          <li>Auf der Projektseite <strong>Fork</strong> klicken &mdash; GitHub legt eine Kopie unter deinem Account an.</li>
+          <li>Deinen Fork klonen, einen Branch anlegen, committen, <strong>in deinen Fork</strong> pushen.</li>
+          <li>Auf GitHub einen PR öffnen: <em>base repository</em> = Originalprojekt, <em>head repository</em> = dein Fork.</li>
+          <li>Die Maintainer des Originals reviewen und mergen &mdash; oder auch nicht.</li>
+        </ol>
+        <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – Fork aktuell halten</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git remote add upstream https://github.com/original/projekt.git
+git fetch upstream
+git switch main
+git merge upstream/main
+git push                       # Fork auf GitHub aktualisieren</code></pre>
+</div>
+        <p><code>upstream</code> ist ein zweites Remote neben <code>origin</code> (deinem Fork). Einfacher geht es auf GitHub mit dem Button <strong>Sync fork</strong>.</p>
+      </section>
+
+      <section class="section">
+        <h2>10 — Pull Requests im Terminal: GitHub CLI</h2>
+        <p>Die GitHub CLI (<code>gh</code>, Lektion 1.2) erledigt fast alles ohne Browser:</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Befehl</th><th>Wirkung</th></tr></thead>
+            <tbody>
+              <tr><td><code>gh pr create --fill</code></td><td>PR für den aktuellen Branch erstellen, Titel/Beschreibung aus den Commits</td></tr>
+              <tr><td><code>gh pr list</code></td><td>offene PRs anzeigen</td></tr>
+              <tr><td><code>gh pr checkout 7</code></td><td>den Branch von PR #7 lokal auschecken, um ihn zu testen</td></tr>
+              <tr><td><code>gh pr view 7 --web</code></td><td>PR #7 im Browser öffnen</td></tr>
+              <tr><td><code>gh pr review 7 --approve</code></td><td>PR #7 genehmigen</td></tr>
+              <tr><td><code>gh pr merge 7 --squash --delete-branch</code></td><td>PR #7 per Squash mergen und den Branch löschen</td></tr>
+              <tr><td><code>gh issue create</code>, <code>gh issue list</code></td><td>Issues anlegen und anzeigen</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+  <div class="projekt-box-header">
+    <span class="projekt-step">Projektschritt 2.4</span>
+    <h3>Pull Request mit Partner-Review</h3>
+  </div>
+<p>Arbeite mit einer Partnerin oder einem Partner. Jeder führt die Schritte im <strong>eigenen</strong> Repository aus und ist Reviewer im anderen.</p>
+          <ol>
+            <li>Lade dein Gegenüber als Collaborator ein.</li>
+            <li>Lege ein Ruleset für <code>main</code> an: <em>Require a pull request</em> mit 1 Approval, <em>Block force pushes</em>. Teste: Ein direkter Push auf <code>main</code> wird abgelehnt.</li>
+            <li>Lege ein Issue „Abschnitt Projekte ergänzen“ an.</li>
+            <li>Erstelle <code>feature/projekte</code>, ergänze den Abschnitt, pushe und öffne einen PR mit Beschreibung nach dem Muster aus Abschnitt 2 und <code>Closes #…</code>.</li>
+            <li>Dein Gegenüber reviewt: mindestens ein Kommentar und ein <em>suggestion</em>, Ergebnis „Request changes“.</li>
+            <li>Übernimm den Vorschlag (<em>Commit suggestion</em>), setze den Kommentar mit einem eigenen Commit um, fordere ein neues Review an.</li>
+            <li>Nach dem Approve: <strong>Squash and merge</strong>, Branch löschen, lokal aufräumen. Prüfe, dass das Issue geschlossen ist.</li>
+          </ol>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">index.html – Ausschnitt</span>
+    <span class="code-lang">HTML</span>
+  </div>
+  <pre><code class="language-xml">&lt;h2&gt;Projekte&lt;/h2&gt;
+&lt;ul class="projekte"&gt;
+  &lt;li&gt;&lt;strong&gt;Wetterstation&lt;/strong&gt; – Arduino, 2. Klasse&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Vokabeltrainer&lt;/strong&gt; – Java, 3. Klasse&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+</div>
+          <div class="code-block">
+  <div class="code-header">
+    <span class="code-filename">Terminal – nach dem Merge</span>
+    <span class="code-lang">Bash</span>
+  </div>
+  <pre><code class="language-bash">git switch main
+git pull
+git branch -D feature/projekte   # -D, weil per Squash gemergt
+git fetch --prune
+git log --oneline -3</code></pre>
+</div>
+</div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>Häufige Fehler</h2>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: base und compare vertauscht</div>
+  <p>Der PR zeigt <em>There isn't anything to compare</em> oder will <code>main</code> in den Feature-Branch mergen.</p>
+          <p class="fehler-fix">base = Ziel (<code>main</code>), compare = dein Branch. Die Pfeilrichtung im Formular lautet <code>base: main ← compare: feature/…</code>.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Für jede Korrektur ein neuer Pull Request</div>
+  <p>Nach dem Review wird ein Branch <code>feature/projekte-2</code> mit neuem PR angelegt. Die Diskussion des ersten PRs geht verloren.</p>
+          <p class="fehler-fix">Korrekturen einfach auf denselben Branch committen und pushen &mdash; der offene PR aktualisiert sich automatisch.</p>
+</div>
+        <div class="fehler-item">
+  <div class="fehler-title">Fehler: Nach dem Squash-Merge auf dem alten Branch weiterarbeiten</div>
+  <p>Auf <code>feature/projekte</code> werden nach dem Merge weitere Commits gemacht und ein neuer PR geöffnet. Er enthält plötzlich wieder alle alten Commits und Konflikte.</p>
+          <p class="fehler-fix">Nach dem Merge: <code>git switch main</code>, <code>git pull</code>, alten Branch löschen und für neue Arbeit einen neuen Branch von <code>main</code> anlegen.</p>
+</div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 1</span>
+    <span class="aufgabe-title">Merge-Varianten vergleichen</span>
+  </div>
+  <p>Erstelle in deinem Repository drei kleine PRs mit je drei Commits und merge sie mit jeweils einer anderen Variante. Vergleiche danach <code>git log --oneline --graph</code> und beschreibe, woran man jede Variante in der Historie erkennt.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 2</span>
+    <span class="aufgabe-title">Review-Kommentare formulieren</span>
+  </div>
+  <p>Formuliere die folgenden Rückmeldungen als konstruktive Review-Kommentare um: (a) „Falsch eingerückt.“ (b) „Das Bild hat kein alt.“ (c) „Wozu ist diese Funktion?“ (d) „Passt.“ Begründe jeweils, was den neuen Kommentar besser macht.</p>
+</div>
+          <div class="aufgabe">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Aufgabe 3</span>
+    <span class="aufgabe-title">PR-Vorlage</span>
+  </div>
+  <p>Lege in deinem Repository die Datei <code>.github/pull_request_template.md</code> mit den Abschnitten „Was“, „Warum“, „Wie testen“ und einer Checkliste (<code>- [ ] Im Browser getestet</code>, <code>- [ ] Auf Handybreite geprüft</code>) an. Öffne einen neuen PR und prüfe, dass die Vorlage automatisch erscheint.</p>
+</div>
+          <div class="aufgabe aufgabe-bonus">
+  <div class="aufgabe-header">
+    <span class="aufgabe-num">Bonus</span>
+    <span class="aufgabe-title">Erster Open-Source-Beitrag</span>
+  </div>
+  <p>Viele Projekte markieren einsteigerfreundliche Issues mit dem Label „good first issue“. Suche auf GitHub ein solches Issue (z.&nbsp;B. in einer Dokumentation), forke das Projekt und bereite einen PR vor. Lies vorher die Datei <code>CONTRIBUTING.md</code> des Projekts. Du musst den PR nicht abschicken &mdash; beschreibe aber, welche Schritte du gemacht hast.</p>
+</div>
+        </div>
+      </section>
+
+      <section class="section section-quiz">
+        <h2>Wissenskontrolle</h2>
+        <div class="quiz" id="quiz-1">
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Du willst <code>feature/login</code> in <code>main</code> bringen. Wie stellst du den PR ein?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>base: feature/login, compare: main</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>base: main, compare: feature/login</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>base und compare: feature/login</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Die Richtung spielt keine Rolle.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> base ist das Ziel des Merges, compare die Quelle mit den neuen Commits.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Die Reviewerin wünscht Änderungen. Wie setzt du sie um?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Den PR schließen und einen neuen erstellen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weitere Commits auf denselben Branch pushen &ndash; der PR aktualisiert sich automatisch</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Änderungen direkt auf main pushen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Den PR mergen und die Änderungen danach nachreichen</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Ein PR bezieht sich auf einen Branch. Neue Commits auf diesem Branch erscheinen sofort im PR, die Diskussion bleibt erhalten.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was bewirkt <strong>Squash and merge</strong>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Alle Commits werden einzeln und unverändert übernommen, plus Merge-Commit.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Alle Commits des Branches werden zu einem einzigen neuen Commit in main zusammengefasst.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Der Branch wird verworfen, ohne etwas zu übernehmen.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Die Commits von main werden in den Branch kopiert.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Squash fasst alle Änderungen des PRs zu einem Commit zusammen. Die Einzelcommits des Branches erscheinen nicht in main.</div>
+  </div>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Einstellungen in einem Ruleset verhindern, dass ungeprüfter Code nach main kommt?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Require a pull request before merging</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Required approvals: 1</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Require status checks to pass</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Automatically delete head branches</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> PR-Pflicht, Mindestanzahl an Approvals und grüne Checks sichern die Qualität. Das automatische Löschen von Branches ist nur Aufräumen.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Was passiert, wenn in der Beschreibung eines PRs <code>Fixes #12</code> steht?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der PR wird automatisch gemergt.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Issue #12 wird geschlossen, sobald der PR in den Standard-Branch gemergt wird.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der PR erhält die Nummer 12.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Zwölf Reviewer werden angefragt.</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Schlüsselwörter wie Closes, Fixes oder Resolves verknüpfen PR und Issue; beim Merge schließt GitHub das Issue automatisch.</div>
+  </div>
+  <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
+</div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="2.3-merge-konflikt-demo.html">&larr; Lektion 2.3: Demo: Merge-Konflikt mit Alice &amp; Bob</a>
+      <span class="nav-center-info">Lektion 2.4</span>
+      <a class="nav-btn primary" href="2.5-github-actions.html">Lektion 2.5: GitHub Actions &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+  <script>
+    document.querySelectorAll('.quiz').forEach((quiz) => {
+      const fragen = [...quiz.querySelectorAll('.quiz-frage')];
+      const score = quiz.querySelector('.quiz-score');
+      const update = () => {
+        const done = fragen.filter((f) => f.dataset.state).length;
+        const ok = fragen.filter((f) => f.dataset.state === 'ok').length;
+        score.textContent = done === 0
+          ? fragen.length + ' Fragen – wähle eine Antwort und prüfe sie.'
+          : ok + ' von ' + fragen.length + ' richtig'
+            + (done < fragen.length ? ' (' + done + ' von ' + fragen.length + ' bearbeitet)' : '');
+      };
+      fragen.forEach((f) => {
+        const inputs = [...f.querySelectorAll('input')];
+        const check = f.querySelector('.quiz-check');
+        const reveal = f.querySelector('.quiz-reveal');
+        const fb = f.querySelector('.quiz-feedback');
+        const exp = f.querySelector('.quiz-erklaerung');
+        inputs.forEach((i) => i.addEventListener('change', () => {
+          check.disabled = !inputs.some((x) => x.checked);
+        }));
+        const finish = (graded) => {
+          let allOk = true;
+          f.querySelectorAll('.quiz-opt').forEach((li) => {
+            const input = li.querySelector('input');
+            const corr = li.dataset.correct === '1';
+            if (corr !== input.checked) allOk = false;
+            if (corr) li.classList.add('opt-correct');
+            else if (input.checked) li.classList.add('opt-wrong');
+            input.disabled = true;
+          });
+          f.dataset.state = !graded ? 'shown' : (allOk ? 'ok' : 'wrong');
+          fb.className = 'quiz-feedback fb-' + f.dataset.state;
+          fb.textContent = !graded ? 'Lösung angezeigt.'
+            : (allOk ? '✔ Richtig!' : '✘ Leider nicht ganz – die richtige Lösung ist markiert.');
+          fb.hidden = false;
+          exp.hidden = false;
+          check.disabled = true;
+          reveal.disabled = true;
+          update();
+        };
+        check.addEventListener('click', () => finish(true));
+        reveal.addEventListener('click', () => finish(false));
+      });
+      quiz.querySelector('.quiz-reset').addEventListener('click', () => {
+        fragen.forEach((f) => {
+          delete f.dataset.state;
+          f.querySelectorAll('.quiz-opt').forEach((li) => li.classList.remove('opt-correct', 'opt-wrong'));
+          f.querySelectorAll('input').forEach((i) => { i.checked = false; i.disabled = false; });
+          f.querySelector('.quiz-check').disabled = true;
+          f.querySelector('.quiz-reveal').disabled = false;
+          f.querySelector('.quiz-feedback').hidden = true;
+          f.querySelector('.quiz-erklaerung').hidden = true;
+        });
+        update();
+      });
+      update();
+    });
+  </script>
+</body>
+
+</html>
