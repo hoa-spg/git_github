@@ -456,10 +456,10 @@ git log --oneline</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was zeigt <code>git diff --staged</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Alle Änderungen, die noch nicht vorgemerkt sind</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Die Änderungen, die in den nächsten Commit kommen</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Die Unterschiede zwischen lokalem Repository und GitHub</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Alle Dateien, die in <code>.gitignore</code> stehen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Alle Änderungen, die noch nicht vorgemerkt sind</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Die Änderungen, die in den nächsten Commit kommen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -469,10 +469,10 @@ git log --oneline</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Welche Dateien gehören typischerweise in die <code>.gitignore</code>?</p>
     <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>node_modules/</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>.env</code> mit Zugangsdaten</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-2"> <span><code>index.html</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>.env</code> mit Zugangsdaten</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>.DS_Store</code> und <code>Thumbs.db</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span><code>node_modules/</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -482,8 +482,8 @@ git log --oneline</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Ein bereits <strong>gepushter</strong> Commit hat einen Fehler eingebaut. Wie machst du ihn sicher rückgängig?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>git commit --amend</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>git restore index.html</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span><code>git revert &lt;hash&gt;</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>git restore index.html</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Die Datei <code>.git</code> löschen und neu klonen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -494,8 +494,8 @@ git log --oneline</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Du hast <code>config.json</code> committet und erst danach in <code>.gitignore</code> eingetragen. Was passiert?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Git löscht die Datei automatisch aus dem Repository.</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Git verfolgt die Datei weiterhin, bis du sie mit <code>git rm --cached</code> entfernst.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Die Datei wird auf der Festplatte gelöscht.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Git verfolgt die Datei weiterhin, bis du sie mit <code>git rm --cached</code> entfernst.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Git meldet einen Fehler beim nächsten Commit.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -505,10 +505,10 @@ git log --oneline</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> <code>git log --oneline</code> zeigt <code>7a91d2e (HEAD -&gt; main, origin/main) Hobbys ergänzt</code>. Was folgt daraus?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der Commit ist noch nicht gepusht.</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Der lokale <code>main</code> und der zuletzt bekannte Stand am Server zeigen auf denselben Commit.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es gibt einen Merge-Konflikt.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>HEAD ist der Name des Servers.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Der Commit ist noch nicht gepusht.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

@@ -647,10 +647,10 @@ git branch -d feature/titel-b</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Wann entsteht ein Merge-Konflikt?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Immer, wenn zwei Personen dieselbe Datei geändert haben</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Wenn beide Seiten dieselben Zeilen (bzw. benachbarte Zeilen) einer Datei unterschiedlich geändert haben</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Wenn ein Branch älter als eine Woche ist</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Wenn der Push abgelehnt wird</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Immer, wenn zwei Personen dieselbe Datei geändert haben</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -659,9 +659,9 @@ git branch -d feature/titel-b</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Bob führt auf <code>feature/titel-bob</code> <code>git merge main</code> aus. Was steht zwischen <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> und <code>=======</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Bobs Version aus <code>feature/titel-bob</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Alices Version aus <code>main</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Version des gemeinsamen Vorgängers</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Alices Version aus <code>main</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Bobs Version aus <code>feature/titel-bob</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Commit-Message</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -672,32 +672,33 @@ git branch -d feature/titel-b</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Welche Schritte gehören zum Auflösen eines Konflikts beim <strong>Merge</strong>?</p>
     <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Datei bearbeiten und alle Konfliktmarker entfernen</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span><code>git add datei</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span><code>git commit</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Datei bearbeiten und alle Konfliktmarker entfernen</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span><code>git push --force</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span><code>git commit</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Bearbeiten, mit <code>git add</code> als gelöst markieren, mit <code>git commit</code> den Merge abschließen. Ein Force-Push ist dafür nie nötig.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Dein Push wird mit <em>rejected (fetch first)</em> abgelehnt. Was ist der richtige nächste Schritt?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Dein Push wird mit rejected (fetch first) abgelehnt. Was stimmt?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>git push --force</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Die neuen Commits vom Server holen (<code>git pull</code> bzw. <code>git pull --rebase</code>) und danach erneut pushen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Das Repository neu klonen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Den letzten Commit mit <code>git revert</code> rückgängig machen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Der Server hat Commits, die lokal noch fehlen.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Die neuen Commits vom Server holen (<code>git pull</code> bzw. <code>git pull --rebase</code>) und danach erneut pushen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Man muss das Repository neu klonen.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Man überschreibt den Server mit <code>git push --force</code>.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Am Server liegen Commits, die du lokal nicht hast. Git verhindert, dass du sie überschreibst. Erst integrieren, dann pushen.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Der Server hat Commits, die lokal noch fehlen. Man holt sie mit <code>git pull</code> bzw. <code>git pull --rebase</code> und pusht danach erneut. <code>git push --force</code> würde die Commits der anderen überschreiben; neu klonen oder revert ist nicht nötig.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Was ist beim Konflikt während eines <strong>Rebase</strong> anders als beim Merge?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Konflikte können beim Rebase nicht auftreten.</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>HEAD ist der Branch, auf den rebased wird, und man setzt mit <code>git rebase --continue</code> fort.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Konflikte können beim Rebase nicht auftreten.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Man muss die Konfliktmarker nicht entfernen.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Git wählt automatisch die neuere Version.</span></label></li>
     </ul>

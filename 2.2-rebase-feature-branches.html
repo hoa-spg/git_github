@@ -449,10 +449,10 @@ git log --oneline --graph</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was passiert bei <code>git rebase main</code> auf einem Feature-Branch?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein Merge-Commit verbindet den Feature-Branch mit main.</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Die Commits des Feature-Branches werden auf dem neuesten Commit von main neu erzeugt.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>main wird auf den Stand des Feature-Branches gesetzt.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Der Feature-Branch wird gelöscht.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein Merge-Commit verbindet den Feature-Branch mit main.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Die Commits des Feature-Branches werden auf dem neuesten Commit von main neu erzeugt.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -462,8 +462,8 @@ git log --oneline --graph</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Wie lautet die goldene Regel des Rebase?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase nur, wenn es keine Konflikte gibt.</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase immer vor jedem Commit.</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Rebase keine Commits, die bereits geteilt sind und auf denen andere aufbauen.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase immer vor jedem Commit.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Rebase nur auf main.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -474,8 +474,8 @@ git log --oneline --graph</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Warum ist <code>git push --force-with-lease</code> sicherer als <code>git push --force</code>?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil es nur funktioniert, wenn keine Konflikte bestehen</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Weil es abbricht, wenn jemand anderer inzwischen auf den Branch gepusht hat</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil es vorher automatisch einen Pull macht</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Weil es abbricht, wenn jemand anderer inzwischen auf den Branch gepusht hat</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil es nur lokale Branches betrifft</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -486,10 +486,10 @@ git log --oneline --graph</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Aussagen zum Feature-Branch-Workflow stimmen?</p>
     <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Jede Aufgabe bekommt einen eigenen, kurzlebigen Branch.</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Alle arbeiten direkt auf main, Branches gibt es nur für Releases.</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Änderungen kommen über einen Pull Request mit Review nach main.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Jede Aufgabe bekommt einen eigenen, kurzlebigen Branch.</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Nach dem Merge wird der Feature-Branch gelöscht.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Alle arbeiten direkt auf main, Branches gibt es nur für Releases.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -498,9 +498,9 @@ git log --oneline --graph</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Beim Rebase tritt ein Konflikt auf. Du hast die Datei korrigiert. Wie geht es weiter?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git commit -m "Konflikt gelöst"</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span><code>git add datei</code> und dann <code>git rebase --continue</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git push --force</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span><code>git add datei</code> und dann <code>git rebase --continue</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git commit -m "Konflikt gelöst"</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>git merge --continue</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>

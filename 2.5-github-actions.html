@@ -583,10 +583,10 @@ git push -u origin feature/pages</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Wo muss eine Workflow-Datei liegen, damit GitHub sie ausführt?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Im Hauptordner als <code>workflow.yml</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Im Ordner <code>.github/workflows/</code> mit Endung <code>.yml</code> oder <code>.yaml</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>In den Repository-Einstellungen unter Actions</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Im Hauptordner als <code>workflow.yml</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Im Ordner <code>.git/hooks/</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Im Ordner <code>.github/workflows/</code> mit Endung <code>.yml</code> oder <code>.yaml</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -596,9 +596,9 @@ git push -u origin feature/pages</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Warum beginnt fast jeder Job mit <code>uses: actions/checkout</code>?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil sonst die Secrets fehlen</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil der Runner eine frische Maschine ohne den Code des Repositorys ist</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil damit der Branch nach main gemergt wird</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil GitHub es aus Lizenzgründen verlangt</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil der Runner eine frische Maschine ohne den Code des Repositorys ist</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -610,8 +610,8 @@ git push -u origin feature/pages</code></pre>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Mehrere Jobs laufen standardmäßig parallel.</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Mit <code>needs</code> wartet ein Job auf das erfolgreiche Ende eines anderen.</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Schlägt ein Step fehl, werden die folgenden Steps des Jobs nicht ausgeführt.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span>Alle Steps eines Workflows laufen immer auf derselben Maschine, auch über Jobs hinweg.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Schlägt ein Step fehl, werden die folgenden Steps des Jobs nicht ausgeführt.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -620,10 +620,10 @@ git push -u origin feature/pages</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Ein Workflow braucht einen API-Key. Wie wird er richtig eingebunden?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Direkt in die YAML-Datei schreiben</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>In eine Datei <code>key.txt</code> im Repository legen</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Als Repository-Secret anlegen und mit <code>${{ secrets.NAME }}</code> verwenden</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Direkt in die YAML-Datei schreiben</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>In die Commit-Message schreiben</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>In eine Datei <code>key.txt</code> im Repository legen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -632,10 +632,10 @@ git push -u origin feature/pages</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Was bewirkt <strong>Require status checks to pass</strong> in einem Ruleset für main?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Workflows laufen nur noch auf main.</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Ein Pull Request kann erst gemergt werden, wenn die ausgewählten Checks erfolgreich waren.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Fehlgeschlagene Checks werden automatisch wiederholt.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Ein Pull Request kann erst gemergt werden, wenn die ausgewählten Checks erfolgreich waren.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Jeder Push löst eine Benachrichtigung an alle Collaborators aus.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Workflows laufen nur noch auf main.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

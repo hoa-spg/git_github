@@ -458,25 +458,26 @@ git push</code></pre>
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was ist ein Branch in Git technisch gesehen?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was trifft auf einen <strong>Branch</strong> in Git zu?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Eine vollständige Kopie aller Dateien in einem eigenen Ordner</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Ein beweglicher Name, der auf einen Commit zeigt</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein eigenes Repository auf GitHub</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Eine Liste von Dateien, die gemeinsam geändert werden</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Ein beweglicher Name, der auf einen Commit zeigt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Eine vollständige Kopie aller Dateien in einem eigenen Ordner</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Eine Liste von Dateien, die gemeinsam geändert werden</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Einen neuen Branch anzulegen geht sehr schnell, weil keine Dateien kopiert werden</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Ein Branch speichert nur den Hash eines Commits. Deshalb ist das Anlegen so schnell und billig. Beim Committen rückt der aktuelle Branch auf den neuen Commit vor.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Technisch ist ein Branch nur ein beweglicher Name, der auf einen Commit zeigt. Deshalb geht das Anlegen sehr schnell – es werden keine Dateien kopiert. Ein Branch ist kein eigenes Repository und keine Dateiliste.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Du willst die Arbeit aus <code>feature/login</code> in <code>main</code> übernehmen. Welche Befehlsfolge ist richtig?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git switch feature/login</code> und <code>git merge main</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span><code>git switch main</code> und <code>git merge feature/login</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git merge main feature/login</code> auf einem beliebigen Branch</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git push origin feature/login:main</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git switch feature/login</code> und <code>git merge main</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>git merge main feature/login</code> auf einem beliebigen Branch</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -485,10 +486,10 @@ git push</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Wann führt Git einen <strong>Fast-Forward</strong>-Merge durch?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Wenn es keine Konflikte gibt</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Wenn der Ziel-Branch seit dem Abzweigen keine eigenen neuen Commits hat</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Wenn der Feature-Branch nur einen Commit hat</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Immer, wenn man <code>--no-edit</code> angibt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Wenn der Feature-Branch nur einen Commit hat</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Wenn es keine Konflikte gibt</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -497,10 +498,10 @@ git push</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Was unterscheidet <code>git fetch</code> von <code>git pull</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> aktualisiert nur die Remote-Tracking-Branches, <code>pull</code> übernimmt die Änderungen zusätzlich in den aktuellen Branch.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> lädt hoch, <code>pull</code> lädt herunter.</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> funktioniert nur mit SSH.</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> aktualisiert nur die Remote-Tracking-Branches, <code>pull</code> übernimmt die Änderungen zusätzlich in den aktuellen Branch.</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Es gibt keinen Unterschied.</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>fetch</code> funktioniert nur mit SSH.</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
