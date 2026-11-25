@@ -46,6 +46,9 @@
         <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -574,7 +577,9 @@ git branch -d feature/titel-b</code></pre>
       </section>
 
       <section class="section section-fehler">
-        <h2>Häufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>Häufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="fehler-item">
   <div class="fehler-title">Fehler: Konfliktmarker committet</div>
   <p>Die Seite zeigt plötzlich <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</code> und zwei Überschriften. Die Datei wurde mit <code>git add .</code> vorgemerkt, bevor die Marker entfernt waren.</p>
@@ -590,10 +595,14 @@ git branch -d feature/titel-b</code></pre>
   <p>Der Push wird mit <em>rejected</em> abgelehnt, und man versucht es mit <code>git push --force</code>. Damit sind die Commits der anderen am Server gelöscht.</p>
           <p class="fehler-fix">Ein abgelehnter Push heißt: Zuerst die neuen Commits holen (<code>git pull</code> bzw. <code>git pull --rebase</code>), eventuelle Konflikte lösen, dann normal pushen.</p>
 </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
   <div class="aufgabe-header">
@@ -624,6 +633,8 @@ git branch -d feature/titel-b</code></pre>
   <p>Schreibe ein Bash-Skript <code>konflikt-demo.sh</code>, das die komplette Vorbereitung und die Schritte 1–3 automatisch ausführt und mit dem Konflikt stehen bleibt (Tipp: Dateiinhalte mit <code>cat &gt; index.html &lt;&lt;'EOF'</code> schreiben, Zeilen mit <code>sed -i</code> ersetzen). Damit kannst du die Situation jederzeit neu erzeugen und üben.</p>
 </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">

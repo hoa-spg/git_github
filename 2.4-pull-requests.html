@@ -46,6 +46,9 @@
         <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -416,7 +419,9 @@ git log --oneline -3</code></pre>
       </section>
 
       <section class="section section-fehler">
-        <h2>Häufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>Häufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="fehler-item">
   <div class="fehler-title">Fehler: base und compare vertauscht</div>
   <p>Der PR zeigt <em>There isn't anything to compare</em> oder will <code>main</code> in den Feature-Branch mergen.</p>
@@ -432,10 +437,14 @@ git log --oneline -3</code></pre>
   <p>Auf <code>feature/projekte</code> werden nach dem Merge weitere Commits gemacht und ein neuer PR geöffnet. Er enthält plötzlich wieder alle alten Commits und Konflikte.</p>
           <p class="fehler-fix">Nach dem Merge: <code>git switch main</code>, <code>git pull</code>, alten Branch löschen und für neue Arbeit einen neuen Branch von <code>main</code> anlegen.</p>
 </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
   <div class="aufgabe-header">
@@ -466,6 +475,8 @@ git log --oneline -3</code></pre>
   <p>Viele Projekte markieren einsteigerfreundliche Issues mit dem Label „good first issue“. Suche auf GitHub ein solches Issue (z.&nbsp;B. in einer Dokumentation), forke das Projekt und bereite einen PR vor. Lies vorher die Datei <code>CONTRIBUTING.md</code> des Projekts. Du musst den PR nicht abschicken &mdash; beschreibe aber, welche Schritte du gemacht hast.</p>
 </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">

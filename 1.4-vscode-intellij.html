@@ -46,6 +46,9 @@
         <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -300,7 +303,9 @@
       </section>
 
       <section class="section section-fehler">
-        <h2>Häufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>Häufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="fehler-item">
   <div class="fehler-title">Fehler: Den falschen Ordner geöffnet</div>
   <p>VS Code zeigt „The folder currently open doesn't have a git repository“ oder IntelliJ bietet keine Git-Funktionen an &mdash; geöffnet wurde der Ordner <em>über</em> dem Repository oder ein Unterordner einer anderen Struktur.</p>
@@ -316,10 +321,14 @@
   <p>In IntelliJ wurde <code>galerie.html</code> neu angelegt, die Frage „Add file to Git?“ mit „Cancel“ beantwortet. Die Datei bleibt unter <em>Unversioned Files</em> und fehlt im Commit.</p>
           <p class="fehler-fix">Vor dem Commit die Gruppe <strong>Unversioned Files</strong> prüfen und benötigte Dateien anhaken (oder Rechtsklick &rarr; Git &rarr; Add).</p>
 </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
   <div class="aufgabe-header">
@@ -350,6 +359,8 @@
   <p>Beide IDEs protokollieren die Git-Befehle, die sie ausführen: VS Code im Panel <strong>Output</strong> (Auswahl „Git“), IntelliJ im Git-Werkzeugfenster im Reiter <strong>Console</strong>. Führe einen Commit und einen Push in der IDE aus und finde die zugehörigen Befehle im Protokoll.</p>
 </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">

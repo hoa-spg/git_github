@@ -46,6 +46,9 @@
         <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -383,7 +386,9 @@ git log --oneline</code></pre>
       </section>
 
       <section class="section section-fehler">
-        <h2>Häufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>Häufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="fehler-item">
   <div class="fehler-title">Fehler: Neue Datei mit commit -am vergessen</div>
   <p>Nach <code>git commit -am "Galerie ergänzt"</code> fehlt <code>galerie.html</code> im Commit &mdash; die Datei war neu (untracked).</p>
@@ -399,10 +404,14 @@ git log --oneline</code></pre>
   <p>Ein einziger Commit „Änderungen“ enthält Layout, Texte, einen Bugfix und eine halbfertige Funktion. Der Bugfix lässt sich nicht einzeln übernehmen oder rückgängig machen.</p>
           <p class="fehler-fix">Nach jedem abgeschlossenen Arbeitsschritt committen; zusammengehörige Dateien gezielt mit <code>git add &lt;datei&gt;</code> vormerken.</p>
 </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
   <div class="aufgabe-header">
@@ -433,6 +442,8 @@ git log --oneline</code></pre>
   <p>Klone ein großes Open-Source-Repository (z.&nbsp;B. <code>https://github.com/expressjs/express</code>). Finde mit <code>git log</code> heraus: Wann war der erste Commit? Wer hat die meisten Commits (Tipp: <code>git shortlog -sn | head</code>)? Wer hat zuletzt die Datei <code>Readme.md</code> geändert?</p>
 </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">

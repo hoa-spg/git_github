@@ -46,6 +46,9 @@
         <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -510,7 +513,9 @@ git push -u origin feature/pages</code></pre>
       </section>
 
       <section class="section section-fehler">
-        <h2>Häufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>Häufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="fehler-item">
   <div class="fehler-title">Fehler: Workflow-Datei am falschen Ort</div>
   <p>Die Datei liegt in <code>.github/workflow/ci.yml</code> oder <code>github/workflows/ci.yml</code>. Im Reiter Actions passiert nichts.</p>
@@ -526,10 +531,14 @@ git push -u origin feature/pages</code></pre>
   <p><code>npm ci</code> scheitert mit <em>The `npm ci` command can only install with an existing package-lock.json</em>, obwohl die Datei im Repository liegt.</p>
           <p class="fehler-fix">Der Runner startet leer. Als ersten Step <code>uses: actions/checkout@v6</code> eintragen.</p>
 </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
   <div class="aufgabe-header">
@@ -560,6 +569,8 @@ git push -u origin feature/pages</code></pre>
   <p>Erweitere deinen CI-Workflow aus Aufgabe 2 um eine Matrix über <code>os: [ubuntu-latest, windows-latest, macos-latest]</code> (<code>runs-on: ${{ matrix.os }}</code>) und zwei Node-Versionen. Wie viele Jobs entstehen? Vergleiche die Laufzeiten.</p>
 </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">

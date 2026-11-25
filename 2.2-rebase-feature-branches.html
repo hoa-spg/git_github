@@ -46,6 +46,9 @@
         <a class="nav-link" href="2.5-github-actions.html"><span class="ln">2.5</span>GitHub Actions</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -376,7 +379,9 @@ git log --oneline --graph</code></pre>
       </section>
 
       <section class="section section-fehler">
-        <h2>Häufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>Häufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="fehler-item">
   <div class="fehler-title">Fehler: main rebasen</div>
   <p>Jemand führt auf <code>main</code> <code>git rebase feature/x</code> aus und pusht mit <code>--force</code>. Alle anderen bekommen beim nächsten Pull doppelte Commits und Konflikte.</p>
@@ -392,10 +397,14 @@ git log --oneline --graph</code></pre>
   <p>Nach dem Lösen eines Konflikts beim Rebase wird <code>git commit</code> ausgeführt; Git zeigt danach verwirrende Meldungen.</p>
           <p class="fehler-fix">Beim Rebase nach dem Lösen nur <code>git add</code> und dann <code>git rebase --continue</code>. Im Zweifel mit <code>git rebase --abort</code> zurück zum Ausgangszustand.</p>
 </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
   <div class="aufgabe-header">
@@ -426,6 +435,8 @@ git log --oneline --graph</code></pre>
   <p>Bearbeite auf <strong>learngitbranching.js.org</strong> die Levels „Introduction Sequence 4“ (Rebase Introduction) und „Moving Work Around“. Erkläre anschließend, was <code>git cherry-pick</code> macht und wann es nützlich ist.</p>
 </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">
